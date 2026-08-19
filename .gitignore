@@ -3,6 +3,7 @@ vendor/
 composer.phar
 cacert.pem
 
+
 # Python artifacts
 __pycache__/
 *.py[cod]
