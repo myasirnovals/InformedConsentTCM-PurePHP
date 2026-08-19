@@ -1,6 +1,5 @@
 # Vendor / Libraries
 vendor/
-libs/
 composer.phar
 cacert.pem
 
