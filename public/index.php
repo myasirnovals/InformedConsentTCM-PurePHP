@@ -6,7 +6,7 @@ if (empty($_SESSION['csrf_token'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="zh-Hant-SG">
+<html lang="en-SG">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -32,7 +32,7 @@ if (empty($_SESSION['csrf_token'])) {
             background-color: #eef2f6;
         }
         
-        /* Language System */
+        /* Language System (English & Chinese) */
         .lang-elem { display: none; }
         .lang-inline { display: none; }
 
@@ -44,9 +44,6 @@ if (empty($_SESSION['csrf_token'])) {
         
         body.lang-zh .lang-elem.lang-zh { display: block; }
         body.lang-zh .lang-inline.lang-zh { display: inline; }
-        
-        body.lang-id .lang-elem.lang-id { display: block; }
-        body.lang-id .lang-inline.lang-id { display: inline; }
 
         /* Settings Floating Panel */
         .settings-btn {
@@ -319,10 +316,6 @@ if (empty($_SESSION['csrf_token'])) {
             width: 55%;
             color: #0f172a;
         }
-        .medical-history-table td.condition-label .cond-inline {
-            display: inline;
-            margin-right: 6px;
-        }
         .medical-history-table td.radio-cell {
             width: 15%;
             text-align: center;
@@ -340,43 +333,34 @@ if (empty($_SESSION['csrf_token'])) {
             background: #ffffff;
             -webkit-appearance: none;
         }
-        .signature-section {
+        .signature-container {
             margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
         }
-        .signature-block {
-            flex: 1;
-            border-top: 1px solid #333;
-            padding-top: 10px;
-        }
-        .signature-block .sig-line {
-            width: 100%;
-            height: 40px;
-            border-bottom: 1px solid #999;
-            margin-bottom: 5px;
-        }
-        .signature-block .label-sub {
-            font-size: 0.85em;
-            margin-bottom: 5px;
+        .signature-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
         }
         .submit-container {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 30px;
         }
         .submit-btn {
-            background-color: #0056b3;
+            background-color: #1b4965;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 14px 36px;
             font-size: 1.1em;
-            border-radius: 5px;
+            font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25);
+            transition: background-color 0.2s, transform 0.1s;
         }
         .submit-btn:hover {
-            background-color: #004494;
+            background-color: #13354b;
         }
         .signature-flex {
             display: flex;
@@ -392,13 +376,15 @@ if (empty($_SESSION['csrf_token'])) {
             padding-bottom: 5px;
             text-align: center;
         }
-        /* Mobile handling */
+        
+        /* Mobile responsive */
         @media (max-width: 600px) {
             .form-container { padding: 15px; }
             .form-group label { flex: 0 0 100%; max-width: 100%; margin-bottom: 5px; }
-            .inline-inputs { flex-direction: column; gap: 10px; }
-            .inline-field { flex-direction: column; align-items: stretch; }
-            .inline-field label { margin-bottom: 5px; margin-right: 0; }
+            .inline-half-row { flex-direction: column; gap: 12px; }
+            .half-field { flex-direction: column; align-items: stretch; }
+            .half-field label { flex: 0 0 100%; max-width: 100%; margin-bottom: 5px; }
+            
             .medical-history-table, .medical-history-table thead, .medical-history-table tbody, .medical-history-table th, .medical-history-table td, .medical-history-table tr { 
                 display: block; 
                 width: 100%;
@@ -447,21 +433,16 @@ if (empty($_SESSION['csrf_token'])) {
             body.lang-mixed .medical-history-table td:nth-of-type(2):before { content: "Yes / 有"; }
             body.lang-en .medical-history-table td:nth-of-type(2):before { content: "Yes"; }
             body.lang-zh .medical-history-table td:nth-of-type(2):before { content: "有"; }
-            body.lang-id .medical-history-table td:nth-of-type(2):before { content: "Ya"; }
 
             body.lang-mixed .medical-history-table td:nth-of-type(3):before { content: "No / 没有"; }
             body.lang-en .medical-history-table td:nth-of-type(3):before { content: "No"; }
             body.lang-zh .medical-history-table td:nth-of-type(3):before { content: "没有"; }
-            body.lang-id .medical-history-table td:nth-of-type(3):before { content: "Tidak"; }
 
             body.lang-mixed .medical-history-table td:nth-of-type(4):before { content: "Unsure / 不确定"; }
             body.lang-en .medical-history-table td:nth-of-type(4):before { content: "Unsure"; }
             body.lang-zh .medical-history-table td:nth-of-type(4):before { content: "不确定"; }
-            body.lang-id .medical-history-table td:nth-of-type(4):before { content: "Ragu"; }
 
             .medical-history-table td input[type="text"] { width: 100%; }
-            .signature-section { flex-direction: column; }
-            
             .signature-flex { flex-direction: column; align-items: stretch; gap: 10px; }
             .sig-pad-col, .sig-date-col { border-bottom: none; }
             .date-input { margin-top: 10px; border-bottom: 1px solid #ccc !important; padding-bottom: 10px; font-size: 16px !important; }
@@ -476,14 +457,12 @@ if (empty($_SESSION['csrf_token'])) {
     <h3>
         <span class="lang-inline lang-en">Language</span>
         <span class="lang-inline lang-zh">语言</span>
-        <span class="lang-inline lang-id">Bahasa</span>
     </h3>
-    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-mixed"> Campuran (Mixed)</label>
-    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-en"> English</label>
-    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-zh"> 中文 (Chinese)</label>
-    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-id"> Indonesia</label>
-    <hr style="margin: 15px 0;">
-    <button type="button" id="testFillBtn" style="width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Test Fill Data</button>
+    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-mixed"> English &amp; 中文 (Bilingual)</label>
+    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-en"> English Only</label>
+    <label class="lang-option"><input type="radio" name="lang_setting" value="lang-zh"> 仅限中文 (Chinese Only)</label>
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #e2e8f0;">
+    <button type="button" id="testFillBtn" style="width: 100%; padding: 9px; background: #16a34a; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">Test Fill Data</button>
 </div>
 
 <div class="form-container">
@@ -492,34 +471,29 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="header">
             <h1 class="lang-elem lang-en">SIAH AH CHEOK CHINESE SIN-SEH CLINIC</h1>
             <h2 class="lang-elem lang-zh">谢存灼中医诊所</h2>
-            <h1 class="lang-elem lang-id">KLINIK SINSHE TCM SIAH AH CHEOK</h1>
             <h3 class="lang-elem lang-en">INFORMED CONSENT TO TCM TREATMENT AND ACUPUNCTURE</h3>
             <h4 class="lang-elem lang-zh">中医治疗与针灸同意书</h4>
-            <h3 class="lang-elem lang-id">PERSETUJUAN TINDAKAN PENGOBATAN TCM DAN AKUPUNTUR</h3>
         </div>
 
         <!-- Section: Patient Details -->
         <fieldset>
             <legend>
-                <span class="lang-inline lang-en">Patient </span>
+                <span class="lang-inline lang-en">Patient Particulars </span>
                 <span class="lang-inline lang-zh">病人资料:</span>
-                <span class="lang-inline lang-id">Data Pasien:</span>
             </legend>
             
             <div class="form-group">
                 <label for="patient_name">
                     <span class="lang-inline lang-en">Name </span>
                     <span class="lang-inline lang-zh">姓名：</span>
-                    <span class="lang-inline lang-id">Nama:</span>
                 </label>
                 <div class="input-wrapper"><input type="text" id="patient_name" name="patient_name" required></div>
             </div>
 
             <div class="form-group">
                 <label for="patient_nric">
-                    <span class="lang-inline lang-en">NRIC / Fin No. </span>
+                    <span class="lang-inline lang-en">NRIC / FIN No. </span>
                     <span class="lang-inline lang-zh">身份证号码：</span>
-                    <span class="lang-inline lang-id">No. KTP/FIN:</span>
                 </label>
                 <div class="input-wrapper"><input type="text" id="patient_nric" name="patient_nric" required></div>
             </div>
@@ -528,7 +502,6 @@ if (empty($_SESSION['csrf_token'])) {
                 <label for="patient_address">
                     <span class="lang-inline lang-en">Address </span>
                     <span class="lang-inline lang-zh">地址:</span>
-                    <span class="lang-inline lang-id">Alamat:</span>
                 </label>
                 <div class="input-wrapper">
                     <input type="text" id="patient_address" name="patient_address" required>
@@ -540,7 +513,6 @@ if (empty($_SESSION['csrf_token'])) {
                     <label for="patient_postal">
                         <span class="lang-inline lang-en">Postal Code </span>
                         <span class="lang-inline lang-zh">邮区:</span>
-                        <span class="lang-inline lang-id">Kode Pos:</span>
                     </label>
                     <div class="input-wrapper" style="flex:1;">
                         <input type="text" id="patient_postal" name="patient_postal" required>
@@ -550,7 +522,6 @@ if (empty($_SESSION['csrf_token'])) {
                     <label for="patient_contact">
                         <span class="lang-inline lang-en">Contact No. </span>
                         <span class="lang-inline lang-zh">联络电话：</span>
-                        <span class="lang-inline lang-id">No. Telepon:</span>
                     </label>
                     <div class="input-wrapper" style="flex:1;">
                         <input type="tel" id="patient_contact" name="patient_contact" required>
@@ -562,18 +533,15 @@ if (empty($_SESSION['csrf_token'])) {
                 <label>
                     <span class="lang-inline lang-en">Sex </span>
                     <span class="lang-inline lang-zh">性别:</span>
-                    <span class="lang-inline lang-id">Jenis Kelamin:</span>
                 </label>
                 <div class="input-wrapper radio-group">
                     <label><input type="radio" name="patient_sex" value="Male" required> 
                         <span class="lang-inline lang-en">Male </span>
                         <span class="lang-inline lang-zh">男</span>
-                        <span class="lang-inline lang-id">Laki-laki</span>
                     </label>
                     <label><input type="radio" name="patient_sex" value="Female" required> 
                         <span class="lang-inline lang-en">Female </span>
                         <span class="lang-inline lang-zh">女</span>
-                        <span class="lang-inline lang-id">Perempuan</span>
                     </label>
                 </div>
             </div>
@@ -582,7 +550,6 @@ if (empty($_SESSION['csrf_token'])) {
                 <label for="patient_dob">
                     <span class="lang-inline lang-en">Date of Birth </span>
                     <span class="lang-inline lang-zh">出生日期：</span>
-                    <span class="lang-inline lang-id">Tanggal Lahir:</span>
                 </label>
                 <div class="input-wrapper"><input type="date" id="patient_dob" name="patient_dob" required></div>
             </div>
@@ -591,33 +558,26 @@ if (empty($_SESSION['csrf_token'])) {
         <!-- Section: Next of Kin -->
         <fieldset>
             <legend>
-                <span class="lang-inline lang-en">Next of Kin </span>
-                <span class="lang-inline lang-zh">近亲 / </span>
-                <span class="lang-inline lang-id">Keluarga Dekat / </span>
-                <span class="lang-inline lang-en">Guardian </span>
-                <span class="lang-inline lang-zh">监护人*:</span>
-                <span class="lang-inline lang-id">Wali*:</span>
+                <span class="lang-inline lang-en">Next of Kin / Guardian*: </span>
+                <span class="lang-inline lang-zh">近亲 / 监护人*:</span>
             </legend>
             <p class="note">
                 <span class="lang-inline lang-en">* delete where applicable </span>
                 <span class="lang-inline lang-zh">不适用处可删除</span>
-                <span class="lang-inline lang-id">* coret yang tidak sesuai</span>
             </p>
             
             <div class="form-group">
                 <label for="nok_name">
                     <span class="lang-inline lang-en">Name </span>
                     <span class="lang-inline lang-zh">姓名：</span>
-                    <span class="lang-inline lang-id">Nama:</span>
                 </label>
                 <div class="input-wrapper"><input type="text" id="nok_name" name="nok_name"></div>
             </div>
 
             <div class="form-group">
                 <label for="nok_nric">
-                    <span class="lang-inline lang-en">NRIC / Fin No. </span>
+                    <span class="lang-inline lang-en">NRIC / FIN No. </span>
                     <span class="lang-inline lang-zh">身份证号码：</span>
-                    <span class="lang-inline lang-id">No. KTP/FIN:</span>
                 </label>
                 <div class="input-wrapper"><input type="text" id="nok_nric" name="nok_nric"></div>
             </div>
@@ -626,7 +586,6 @@ if (empty($_SESSION['csrf_token'])) {
                 <label for="nok_relationship">
                     <span class="lang-inline lang-en">Relationship with Patient </span>
                     <span class="lang-inline lang-zh">与病人关系：</span>
-                    <span class="lang-inline lang-id">Hubungan dengan Pasien:</span>
                 </label>
                 <div class="input-wrapper"><input type="text" id="nok_relationship" name="nok_relationship"></div>
             </div>
@@ -636,20 +595,17 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="consent-text">
             <p class="lang-elem lang-en">1）I hereby request and consent to the performance of procedures on me which are within the scope of practice of Chinese Medicine including, but not limited to, history-taking, acupuncture, electroacupuncture, indirect moxibustion, warm needle moxibustion, Tuina and cupping, and herbal prescriptions.</p>
             <p class="lang-elem lang-zh">1）我征求与同意所提供的一切所需的中医治疗，包括但不限于病历记录、针灸、电针治疗、艾灸、温针灸、推拿、拔罐、开方等。</p>
-            <p class="lang-elem lang-id">1）Saya dengan ini meminta dan menyetujui dilakukannya tindakan pada saya yang berada dalam lingkup praktik Pengobatan Tradisional Tiongkok, termasuk namun tidak terbatas pada, anamnesis, akupuntur, elektroakupuntur, moksibusi tidak langsung, moksibusi jarum hangat, Tuina dan bekam, serta peresepan herbal.</p>
         </div>
 
         <!-- Section: Medical History -->
         <fieldset>
             <legend>
-                <span class="lang-inline lang-en">2）I have or previously had the following:</span>
+                <span class="lang-inline lang-en">2）I have or previously had the following: </span>
                 <span class="lang-inline lang-zh">2）我曾有或现有以下情况：</span>
-                <span class="lang-inline lang-id">2）Saya sedang atau pernah mengalami hal berikut:</span>
             </legend>
             <p class="note">
                 <span class="lang-inline lang-en">*Indicate 🗹 where applicable | </span>
                 <span class="lang-inline lang-zh">* 适用处请 🗹 表明</span>
-                <span class="lang-inline lang-id"> | *Beri tanda 🗹 jika sesuai</span>
             </p>
 
             <!-- Quick Batch Select Toolbar -->
@@ -657,17 +613,14 @@ if (empty($_SESSION['csrf_token'])) {
                 <span class="label-text">
                     <span class="lang-inline lang-en">⚡ Quick Batch Select:</span>
                     <span class="lang-inline lang-zh">⚡ 快捷批量选择:</span>
-                    <span class="lang-inline lang-id">⚡ Pilih Cepat:</span>
                 </span>
                 <button type="button" class="batch-btn btn-unsure" onclick="setAllMedical('Unsure')">
                     <span class="lang-inline lang-en">Set All Unsure</span>
                     <span class="lang-inline lang-zh">全部选 "不确定"</span>
-                    <span class="lang-inline lang-id">Set Semua Ragu</span>
                 </button>
                 <button type="button" class="batch-btn btn-no" onclick="setAllMedical('No')">
                     <span class="lang-inline lang-en">Set All No</span>
                     <span class="lang-inline lang-zh">全部选 "没有"</span>
-                    <span class="lang-inline lang-id">Set Semua Tidak</span>
                 </button>
             </div>
             
@@ -677,22 +630,18 @@ if (empty($_SESSION['csrf_token'])) {
                         <th>
                             <span class="lang-elem lang-en">Condition</span>
                             <span class="lang-elem lang-zh">疾病/情况</span>
-                            <span class="lang-elem lang-id">Kondisi</span>
                         </th>
                         <th>
                             <span class="lang-elem lang-en">Yes</span>
                             <span class="lang-elem lang-zh">有</span>
-                            <span class="lang-elem lang-id">Ya</span>
                         </th>
                         <th>
                             <span class="lang-elem lang-en">No</span>
                             <span class="lang-elem lang-zh">没有</span>
-                            <span class="lang-elem lang-id">Tidak</span>
                         </th>
                         <th>
                             <span class="lang-elem lang-en">Unsure</span>
                             <span class="lang-elem lang-zh">不确定</span>
-                            <span class="lang-elem lang-id">Ragu</span>
                         </th>
                     </tr>
                 </thead>
@@ -700,20 +649,20 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     // Helper array to generate rows efficiently for the 14 original questions (a to n)
                     $conditions = [
-                        'a' => ['eng' => 'Heart diseases', 'chi' => '心脏病', 'id' => 'Penyakit jantung', 'key' => 'heart_disease'],
-                        'b' => ['eng' => 'Implantation of cardiac pacemaker', 'chi' => '装上心脏起搏器', 'id' => 'Pemasangan alat pacu jantung', 'key' => 'pacemaker'],
-                        'c' => ['eng' => 'Diabetes', 'chi' => '糖尿病', 'id' => 'Diabetes / Kencing manis', 'key' => 'diabetes'],
-                        'd' => ['eng' => 'High blood pressure', 'chi' => '高血压', 'id' => 'Tekanan darah tinggi (Hipertensi)', 'key' => 'high_blood_pressure'],
-                        'e' => ['eng' => 'High cholesterol', 'chi' => '高胆固醇', 'id' => 'Kolesterol tinggi', 'key' => 'high_cholesterol'],
-                        'f' => ['eng' => 'Cancer', 'chi' => '癌症', 'id' => 'Kanker', 'key' => 'cancer', 'spec' => 'cancer_spec'],
-                        'g' => ['eng' => 'Sensitive skin', 'chi' => '皮肤敏感', 'id' => 'Kulit sensitif', 'key' => 'sensitive_skin'],
-                        'h' => ['eng' => 'Allergies', 'chi' => '药物过敏', 'id' => 'Alergi obat', 'key' => 'allergies', 'spec' => 'allergies_spec'],
-                        'i' => ['eng' => 'HIV/AIDS', 'chi' => '艾滋病', 'id' => 'HIV/AIDS', 'key' => 'hiv_aids'],
-                        'j' => ['eng' => 'Seizures', 'chi' => '抽搐', 'id' => 'Kejang / Epilepsi', 'key' => 'seizures'],
-                        'k' => ['eng' => 'Consumption of anti-coagulants', 'chi' => '服用血薄药等抗凝血剂', 'id' => 'Konsumsi obat pengencer darah / antikoagulan', 'key' => 'anti_coagulants'],
-                        'l' => ['eng' => 'Operation', 'chi' => '手术', 'id' => 'Operasi / Tindakan bedah', 'key' => 'operation', 'spec' => 'operation_spec'],
-                        'm' => ['eng' => 'Abnormal bleeding', 'chi' => '异常出血', 'id' => 'Pendarahan abnormal', 'key' => 'abnormal_bleeding'],
-                        'n' => ['eng' => 'Currently pregnant (female patients)', 'chi' => '目前怀孕 (女患者)', 'id' => 'Sedang hamil (khusus pasien wanita)', 'key' => 'currently_pregnant'],
+                        'a' => ['eng' => 'Heart diseases', 'chi' => '心脏病', 'key' => 'heart_disease'],
+                        'b' => ['eng' => 'Implantation of cardiac pacemaker', 'chi' => '装上心脏起搏器', 'key' => 'pacemaker'],
+                        'c' => ['eng' => 'Diabetes', 'chi' => '糖尿病', 'key' => 'diabetes'],
+                        'd' => ['eng' => 'High blood pressure', 'chi' => '高血压', 'key' => 'high_blood_pressure'],
+                        'e' => ['eng' => 'High cholesterol', 'chi' => '高胆固醇', 'key' => 'high_cholesterol'],
+                        'f' => ['eng' => 'Cancer', 'chi' => '癌症', 'key' => 'cancer', 'spec' => 'cancer_spec'],
+                        'g' => ['eng' => 'Sensitive skin', 'chi' => '皮肤敏感', 'key' => 'sensitive_skin'],
+                        'h' => ['eng' => 'Allergies', 'chi' => '药物过敏', 'key' => 'allergies', 'spec' => 'allergies_spec'],
+                        'i' => ['eng' => 'HIV/AIDS', 'chi' => '艾滋病', 'key' => 'hiv_aids'],
+                        'j' => ['eng' => 'Seizures', 'chi' => '抽搐', 'key' => 'seizures'],
+                        'k' => ['eng' => 'Consumption of anti-coagulants', 'chi' => '服用血薄药等抗凝血剂', 'key' => 'anti_coagulants'],
+                        'l' => ['eng' => 'Operation', 'chi' => '手术', 'key' => 'operation', 'spec' => 'operation_spec'],
+                        'm' => ['eng' => 'Abnormal bleeding', 'chi' => '异常出血', 'key' => 'abnormal_bleeding'],
+                        'n' => ['eng' => 'Currently pregnant (female patients)', 'chi' => '目前怀孕 (女患者)', 'key' => 'currently_pregnant'],
                     ];
 
                     foreach ($conditions as $index => $data) {
@@ -721,13 +670,11 @@ if (empty($_SESSION['csrf_token'])) {
                         echo "<td class='condition-label'><strong>{$index})</strong> ";
                         echo "<span class='lang-elem lang-en' style='display:inline; margin-right:4px;'>{$data['eng']}</span>";
                         echo "<span class='lang-elem lang-zh' style='display:inline; margin-right:4px;'>{$data['chi']}</span>";
-                        echo "<span class='lang-elem lang-id' style='display:inline; margin-right:4px;'>{$data['id']}</span>";
                         
                         // Add specification input if needed (for f, h, l)
                         if (isset($data['spec'])) {
                             echo "<span class='lang-inline lang-en'><br>(please specify: </span>";
                             echo "<span class='lang-inline lang-zh'><br>(请注明: </span>";
-                            echo "<span class='lang-inline lang-id'><br>(mohon sebutkan: </span>";
                             echo "<input type='text' name='{$data['spec']}' style='width:50%; border-bottom:1px solid #999; border-top:none; border-left:none; border-right:none; padding:0; height:20px;'> )";
                         }
                         echo "</td>";
@@ -745,7 +692,6 @@ if (empty($_SESSION['csrf_token'])) {
             <label for="other_conditions">
                 <span class="lang-elem lang-en">If there are other conditions that you wish to inform the physician, please indicate below:</span>
                 <span class="lang-elem lang-zh">若有其它医师须知的情况，请在以下注明：</span>
-                <span class="lang-elem lang-id">Jika ada kondisi lain yang ingin Anda beritahukan kepada dokter, mohon sebutkan di bawah ini:</span>
             </label>
             <textarea id="other_conditions" name="other_conditions" class="other-conditions"></textarea>
         </fieldset>
@@ -754,23 +700,18 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="consent-text">
             <p class="lang-elem lang-en">3）I have had an opportunity to discuss with TCM Practitioner the nature and purpose of acupuncture. I understand that results are not guaranteed.</p>
             <p class="lang-elem lang-zh">3）我有机会与中医师探讨针灸的作用与性质，并了解其中疗效不能保证。</p>
-            <p class="lang-elem lang-id">3）Saya telah diberi kesempatan untuk mendiskusikan sifat dan tujuan akupuntur dengan Praktisi TCM. Saya memahami bahwa hasil pengobatan tidak dapat dijamin.</p>
             
             <p class="lang-elem lang-en">4）I understand and am informed that in the practice of acupuncture and acupressure there are some risks to treatment, including, but not limited to, bruising, tingling or soreness near the needling sites that may last a few days. There have been instances reported of fainting, infections and scarring. I will notify the TCM Practitioner if I take steroids or anti-coagulants or if I have an implanted pacemaker or a prosthetic heart valve. If I experience any gastrointestinal upset or apparent allergic reactions to an herbal prescription, I will stop taking the herbs and inform the TCM Practitioner.</p>
             <p class="lang-elem lang-zh">4）我了解并已收到医师告知针灸与穴位按摩治疗包含某些风险，包括但不限于针刺部位出现出血损伤、刺痛、酸胀感等。这些损伤或不适感可持续几天。针灸治疗曾有晕针、发炎、导致伤疤的实例。若我有服用激素、抗凝剂或有植入心脏起搏器、人工心脏瓣膜，必定通知中医师。若我在服药期间出现肠胃不适或对药物起过敏反应，我必定暂停服药并马上通知提供治疗的中医师。</p>
-            <p class="lang-elem lang-id">4）Saya mengerti dan telah diberi tahu bahwa dalam praktik akupuntur dan akupresur terdapat beberapa risiko pengobatan, termasuk namun tidak terbatas pada memar, kesemutan, atau rasa pegal di dekat area penusukan jarum yang dapat berlangsung selama beberapa hari. Terdapat kasus dilaporkan berupa pingsan, infeksi, dan jaringan parut. Saya akan memberi tahu Praktisi TCM jika saya mengonsumsi steroid atau obat pengencer darah, atau jika saya memakai alat pacu jantung atau katup jantung buatan. Jika saya mengalami gangguan pencernaan atau reaksi alergi yang jelas terhadap resep herbal, saya akan berhenti mengonsumsi herbal tersebut dan memberi tahu Praktisi TCM.</p>
 
             <p class="lang-elem lang-en">5）I do not expect the TCM Practitioner to be able to anticipate and explain all risks and complications, and I wish to rely on the TCM Practitioner to exercise judgment during the course of the treatments, based upon the facts then known.</p>
             <p class="lang-elem lang-zh">5）我不要求提供治疗的中医师能预知或能解释所有的风险或并发症，我相信医师能在治疗期间根据他所得知的资料做出对的判断。</p>
-            <p class="lang-elem lang-id">5）Saya tidak mengharapkan Praktisi TCM dapat mengantisipasi dan menjelaskan semua risiko serta komplikasi, dan saya bersedia mengandalkan Praktisi TCM untuk menggunakan penilaiannya selama proses perawatan berdasarkan fakta yang diketahui saat itu.</p>
 
             <p class="lang-elem lang-en">6）I understand that all personal information collected during the course of treatment is solely used for the purpose of providing the service.</p>
             <p class="lang-elem lang-zh">6）我了解医师在治疗期间所收集的个人资料是仅为了让医师提供治疗服务。</p>
-            <p class="lang-elem lang-id">6）Saya mengerti bahwa semua informasi pribadi yang dikumpulkan selama proses perawatan hanya digunakan untuk tujuan penyediaan layanan medis.</p>
 
             <p class="lang-elem lang-en">7）I have read, or have had read to me, the above consent. I have also had an opportunity to ask questions about its content, and by signing below I agree to the above-named procedures. I intend this consent form to cover the entire course of treatment for my present condition and for any future condition(s) for which I seek treatment.</p>
             <p class="lang-elem lang-zh">7）我已阅读或已闻之以上同意书。我有机会向医师提问相关内容，并签署与答应以上所提出的程序。我有意让此同意书涵盖我目前与将来的全程治疗。</p>
-            <p class="lang-elem lang-id">7）Saya telah membaca, atau dibacakan, persetujuan di atas. Saya juga memiliki kesempatan untuk bertanya mengenai isinya, dan dengan menandatangani di bawah ini, saya menyetujui prosedur-prosedur yang disebutkan. Saya bermaksud agar formulir persetujuan ini mencakup seluruh rangkaian pengobatan untuk kondisi saya saat ini dan untuk kondisi-kondisi di masa mendatang ketika saya mencari pengobatan.</p>
         </div>
 
         <!-- Section: Signatures (HTML representation) -->
@@ -779,39 +720,35 @@ if (empty($_SESSION['csrf_token'])) {
                 <div class="signature-flex">
                     <div class="sig-pad-col">
                         <div class="sig-line">
-                            <div style="border: 1px dashed #ccc; background-color: #f9f9f9; width: 100%; height: 120px; position: relative;">
+                            <div style="border: 1px dashed #cbd5e1; background-color: #ffffff; width: 100%; height: 120px; position: relative; border-radius: 4px;">
                                 <canvas id="patientSignaturePad" style="width: 100%; height: 100%; touch-action: none; cursor: crosshair;"></canvas>
                             </div>
                             <div style="text-align: right; margin-top: 5px;">
-                                <button type="button" onclick="clearPatientSignature()" style="font-size: 0.8em; padding: 2px 8px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 3px;">
+                                <button type="button" onclick="clearPatientSignature()" style="font-size: 0.8em; padding: 3px 10px; cursor: pointer; background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 3px; font-weight: bold; color: #475569;">
                                     <span class="lang-inline lang-en">Clear </span>
                                     <span class="lang-inline lang-zh">清除</span>
-                                    <span class="lang-inline lang-id">Hapus</span>
                                 </button>
                             </div>
                             <input type="hidden" id="patient_signature_data" name="patient_signature_data">
                         </div>
-                        <div style="padding-top: 5px; border-top: 1px solid #333;">
+                        <div style="padding-top: 5px; border-top: 1px solid #1e293b;">
                             <p style="margin: 0; font-weight: bold;" class="lang-elem lang-en">Signature of Patient / Next of Kin / Guardian*</p>
                             <p style="margin: 0;" class="lang-elem lang-zh">病人 / 近亲 / 监护人签名*</p>
-                            <p style="margin: 0; font-weight: bold;" class="lang-elem lang-id">Tanda Tangan Pasien / Keluarga Dekat / Wali*</p>
                         </div>
                     </div>
                     <div class="sig-date-col">
                         <div class="sig-line">
                             <input type="date" name="patient_signature_date" class="date-input" style="border: none; background: transparent; font-size: 1.1em; text-align: center; width: 100%; outline: none;" required>
                         </div>
-                        <div style="padding-top: 5px; border-top: 1px solid #333; text-align: center;">
+                        <div style="padding-top: 5px; border-top: 1px solid #1e293b; text-align: center;">
                             <p style="margin: 0; font-weight: bold;" class="lang-elem lang-en">Date</p>
                             <p style="margin: 0;" class="lang-elem lang-zh">日期</p>
-                            <p style="margin: 0; font-weight: bold;" class="lang-elem lang-id">Tanggal</p>
                         </div>
                     </div>
                 </div>
                 <div style="margin-top: 15px;">
-                    <p style="margin: 0; font-size: 0.85em; color: #666;" class="lang-elem lang-en"><i>*Guardian's or Next of Kin's details and signature are mandatory for <b>patient below 21 years of age.</b></i></p>
-                    <p style="margin: 0; font-size: 0.85em; color: #666;" class="lang-elem lang-zh"><i>对于 <b>21 岁以下的病人</b>需要近亲或监护人提供签名与个人资料</i></p>
-                    <p style="margin: 0; font-size: 0.85em; color: #666;" class="lang-elem lang-id"><i>*Detail dan tanda tangan Wali atau Keluarga Dekat wajib diisi untuk <b>pasien berusia di bawah 21 tahun.</b></i></p>
+                    <p style="margin: 0; font-size: 0.85em; color: #64748b;" class="lang-elem lang-en"><i>*Guardian's or Next of Kin's details and signature are mandatory for <b>patient below 21 years of age.</b></i></p>
+                    <p style="margin: 0; font-size: 0.85em; color: #64748b;" class="lang-elem lang-zh"><i>对于 <b>21 岁以下的病人</b>需要近亲或监护人提供签名与个人资料</i></p>
                 </div>
             </div>
             
@@ -819,35 +756,32 @@ if (empty($_SESSION['csrf_token'])) {
                 <div class="signature-flex">
                     <div class="sig-pad-col">
                         <div class="sig-line">
-                            <div style="border: 1px dashed #ccc; background-color: #f9f9f9; width: 100%; height: 120px; position: relative;">
+                            <div style="border: 1px dashed #cbd5e1; background-color: #ffffff; width: 100%; height: 120px; position: relative; border-radius: 4px;">
                                 <canvas id="practitionerSignaturePad" style="width: 100%; height: 100%; touch-action: none; cursor: crosshair;"></canvas>
                             </div>
                             <div style="text-align: right; margin-top: 5px;">
-                                <button type="button" onclick="clearPractitionerSignature()" style="font-size: 0.8em; padding: 2px 8px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 3px;">
+                                <button type="button" onclick="clearPractitionerSignature()" style="font-size: 0.8em; padding: 3px 10px; cursor: pointer; background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 3px; font-weight: bold; color: #475569;">
                                     <span class="lang-inline lang-en">Clear </span>
                                     <span class="lang-inline lang-zh">清除</span>
-                                    <span class="lang-inline lang-id">Hapus</span>
                                 </button>
                             </div>
                             <input type="hidden" id="practitioner_signature_data" name="practitioner_signature_data">
                             <div style="margin-top: 10px; margin-bottom: 5px;">
-                                <input type="text" name="physician_name" id="physician_name" placeholder="Name of TCM Practitioner / 医师姓名" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+                                <input type="text" name="physician_name" id="physician_name" placeholder="Name of TCM Practitioner / 医师姓名" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px;" required>
                             </div>
                         </div>
-                        <div style="padding-top: 5px; border-top: 1px solid #333;">
+                        <div style="padding-top: 5px; border-top: 1px solid #1e293b;">
                             <p style="margin: 0; font-weight: bold;" class="lang-elem lang-en">Signature of TCM Practitioner</p>
                             <p style="margin: 0;" class="lang-elem lang-zh">医师签名</p>
-                            <p style="margin: 0; font-weight: bold;" class="lang-elem lang-id">Tanda Tangan Praktisi TCM</p>
                         </div>
                     </div>
                     <div class="sig-date-col">
                         <div class="sig-line">
                             <input type="date" name="practitioner_signature_date" class="date-input" style="border: none; background: transparent; font-size: 1.1em; text-align: center; width: 100%; outline: none;" required>
                         </div>
-                        <div style="padding-top: 5px; border-top: 1px solid #333; text-align: center;">
+                        <div style="padding-top: 5px; border-top: 1px solid #1e293b; text-align: center;">
                             <p style="margin: 0; font-weight: bold;" class="lang-elem lang-en">Date</p>
                             <p style="margin: 0;" class="lang-elem lang-zh">日期</p>
-                            <p style="margin: 0; font-weight: bold;" class="lang-elem lang-id">Tanggal</p>
                         </div>
                     </div>
                 </div>
@@ -859,30 +793,25 @@ if (empty($_SESSION['csrf_token'])) {
             <button type="button" class="batch-btn btn-unsure" onclick="setAllMedical('Unsure')">
                 <span class="lang-inline lang-en">Set All Unsure</span>
                 <span class="lang-inline lang-zh">全部选 "不确定"</span>
-                <span class="lang-inline lang-id">Set Semua Ragu</span>
             </button>
             <button type="button" class="batch-btn btn-no" onclick="setAllMedical('No')">
                 <span class="lang-inline lang-en">Set All No</span>
                 <span class="lang-inline lang-zh">全部选 "没有"</span>
-                <span class="lang-inline lang-id">Set Semua Tidak</span>
             </button>
             <button type="button" class="batch-btn btn-clear" onclick="clearPatientSignature()">
                 <span class="lang-inline lang-en">Clear Patient Signature</span>
                 <span class="lang-inline lang-zh">清除患者签名</span>
-                <span class="lang-inline lang-id">Hapus TTD Pasien</span>
             </button>
             <button type="button" class="batch-btn btn-clear" onclick="clearPractitionerSignature()">
                 <span class="lang-inline lang-en">Clear Doctor Signature</span>
                 <span class="lang-inline lang-zh">清除医师签名</span>
-                <span class="lang-inline lang-id">Hapus TTD Dokter</span>
             </button>
         </div>
 
         <div class="submit-container">
             <button type="submit" class="submit-btn">
-                <span class="lang-inline lang-en">Submit Consent </span>
+                <span class="lang-inline lang-en">Submit Consent Form </span>
                 <span class="lang-inline lang-zh">提交同意书</span>
-                <span class="lang-inline lang-id">Kirim Persetujuan</span>
             </button>
         </div>
 
@@ -909,16 +838,16 @@ if (empty($_SESSION['csrf_token'])) {
         settingsBtn.classList.toggle('open');
     });
     
-    // Load preference
+    // Load preference (default: lang-mixed)
     const savedLang = localStorage.getItem('tcm_lang_pref') || 'lang-mixed';
-    document.body.className = savedLang;
+    document.body.className = (savedLang === 'lang-id') ? 'lang-mixed' : savedLang;
     langRadios.forEach(radio => {
-        if(radio.value === savedLang) radio.checked = true;
+        if(radio.value === document.body.className) radio.checked = true;
         
         radio.addEventListener('change', (e) => {
             document.body.className = e.target.value;
             localStorage.setItem('tcm_lang_pref', e.target.value);
-            setTimeout(resizeCanvas, 100); // re-adjust canvas if layout shifts
+            setTimeout(resizeCanvas, 100);
         });
     });
 
@@ -979,71 +908,62 @@ if (empty($_SESSION['csrf_token'])) {
         }
     }
     
-    // Translations for JS alerts
+    // Translations for JS alerts (English & Chinese only)
     const getTranslation = (key) => {
         const currentLang = document.body.className;
         const dict = {
             'error_patient_sig': {
                 'lang-en': '- Please provide patient signature.\n',
                 'lang-zh': '- 请提供病人签名。\n',
-                'lang-id': '- Mohon berikan tanda tangan pasien.\n',
                 'lang-mixed': '- Please provide patient signature. 请提供病人签名。\n'
             },
             'error_practitioner_sig': {
                 'lang-en': '- Please provide practitioner signature.\n',
                 'lang-zh': '- 请提供医师签名。\n',
-                'lang-id': '- Mohon berikan tanda tangan dokter.\n',
                 'lang-mixed': '- Please provide practitioner signature. 请提供医师签名。\n'
             },
             'error_guardian': {
                 'lang-en': '- Patient is under 21. Guardian details are mandatory.\n',
                 'lang-zh': '- 21岁以下患者必须填写监护人资料。\n',
-                'lang-id': '- Pasien berusia di bawah 21 tahun. Detail wali wajib diisi.\n',
                 'lang-mixed': '- Patient is under 21. Guardian details are mandatory. 21岁以下患者必须填写监护人资料。\n'
             },
             'error_specify': {
                 'lang-en': '- Please specify details for: ',
                 'lang-zh': '- 请注明详情: ',
-                'lang-id': '- Mohon sebutkan detail untuk: ',
                 'lang-mixed': '- Please specify details for (请注明): '
             },
             'error_title': {
                 'lang-en': 'Form Submission Error:\n\n',
                 'lang-zh': '表单提交错误:\n\n',
-                'lang-id': 'Kesalahan Pengiriman Formulir:\n\n',
                 'lang-mixed': 'Form Submission Error / 表单提交错误:\n\n'
             },
             'success_title': {
                 'lang-en': 'Success!',
                 'lang-zh': '成功!',
-                'lang-id': 'Berhasil!',
                 'lang-mixed': 'Success! 成功!'
             },
             'consent_id': {
                 'lang-en': 'Consent ID:',
                 'lang-zh': '同意书 ID:',
-                'lang-id': 'ID Persetujuan:',
                 'lang-mixed': 'Consent ID / 同意书 ID:'
             },
             'download_pdf': {
                 'lang-en': 'Download PDF',
                 'lang-zh': '下载 PDF',
-                'lang-id': 'Unduh PDF',
                 'lang-mixed': 'Download PDF / 下载 PDF'
             },
             'new_form': {
                 'lang-en': 'Start New Form',
                 'lang-zh': '新表单',
-                'lang-id': 'Formulir Baru',
                 'lang-mixed': 'Start New Form / 新表单'
             }
         };
-        return dict[key][currentLang] || dict[key]['lang-mixed'];
+        return (dict[key] && dict[key][currentLang]) ? dict[key][currentLang] : dict[key]['lang-mixed'];
     };
 
     // Save signature data and validate before submit
     document.getElementById('consentForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
         let hasError = false;
         let errorMessage = '';
 
@@ -1116,13 +1036,13 @@ if (empty($_SESSION['csrf_token'])) {
         .then(data => {
             if (data.success) {
                 document.querySelector('.form-container').innerHTML = `
-                    <div style='background-color: #d4edda; color: #155724; padding: 25px; border: 1px solid #c3e6cb; border-radius: 5px; text-align: center;'>
+                    <div style='background-color: #dcfce7; color: #166534; padding: 25px; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center;'>
                         <h2 style='margin-top:0;'>${getTranslation('success_title')}</h2>
                         <p>${data.message}</p>
                         <p>${getTranslation('consent_id')} <strong>${data.token}</strong></p>
                         <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
-                            <a href="../api/generate_pdf.php?token=${data.token}" target="_blank" style="text-decoration: none; background-color: #0056b3; color: white; padding: 10px 20px; border-radius: 4px; font-weight: bold; border: 1px solid #004494;">${getTranslation('download_pdf')}</a>
-                            <button onclick='window.location.reload()' style='padding: 10px 20px; cursor: pointer; background-color: #6c757d; color: white; border: none; border-radius: 4px;'>${getTranslation('new_form')}</button>
+                            <a href="../api/generate_pdf.php?token=${data.token}" target="_blank" style="text-decoration: none; background-color: #1b4965; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold;">${getTranslation('download_pdf')}</a>
+                            <button onclick='window.location.reload()' style='padding: 10px 20px; cursor: pointer; background-color: #64748b; color: white; border: none; border-radius: 6px; font-weight: bold;'>${getTranslation('new_form')}</button>
                         </div>
                     </div>`;
             } else {
