@@ -98,27 +98,27 @@ class TcmPdfGenerator
 
         $pdf->SetFont($fontChinese, '', 12);
 
-        // Patient Name [135.0, 116.0, 281.0, 127.0]
+        // Patient Name [135.0, 116.0, 281.0, 127.0] -> y=115.5
         $patientName = $patient['name'] ?? '';
-        $pdf->SetXY(136, 118);
+        $pdf->SetXY(136, 115.5);
         $pdf->Cell(144, 12, $patientName, 0, 0, 'L');
 
-        // Sex [333.0, 116.0, 374.0, 127.0]
+        // Sex [333.0, 116.0, 374.0, 127.0] -> y=115.5, left-aligned next to label
         $gender = strtoupper(substr(trim($patient['gender'] ?? ''), 0, 1));
         if ($gender !== 'M' && $gender !== 'F') $gender = $patient['gender'] ?? '';
-        $pdf->SetXY(333, 118);
-        $pdf->Cell(41, 12, $gender, 0, 0, 'C');
+        $pdf->SetXY(333, 115.5);
+        $pdf->Cell(30, 12, $gender, 0, 0, 'L');
 
-        // NRIC [485.0, 117.0, 586.0, 128.0]
-        $pdf->SetXY(487, 118);
+        // NRIC [485.0, 117.0, 586.0, 128.0] -> y=115.5
+        $pdf->SetXY(487, 115.5);
         $pdf->Cell(98, 12, $patient['nric'] ?? '', 0, 0, 'L');
 
-        // DOB [151.0, 135.0, 282.0, 146.0]
-        $pdf->SetXY(153, 136.5);
+        // DOB [151.0, 135.0, 282.0, 146.0] -> y=134.0
+        $pdf->SetXY(153, 134.0);
         $pdf->Cell(128, 12, $patient['date_of_birth'] ?? '', 0, 0, 'L');
 
-        // Contact Number [485.0, 136.0, 586.0, 147.0]
-        $pdf->SetXY(487, 137);
+        // Contact Number [485.0, 136.0, 586.0, 147.0] -> y=134.0
+        $pdf->SetXY(487, 134.0);
         $pdf->Cell(98, 12, $patient['contact_number'] ?? '', 0, 0, 'L');
 
         // Medical History Helper
