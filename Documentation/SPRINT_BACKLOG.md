@@ -11,12 +11,12 @@
 ### 1. [US-01] Penyesuaian Tata Letak Alamat & Kontak (Particulars Section)
 * **Deskripsi:** Mengubah tata letak kolom *Address*, *Postal Code*, dan *Contact Number* agar lebih proporsional saat diisi di perangkat tablet/layar klinik.
 * **Kebutuhan Teknis:**
-  - Kolom **Address** menempati 1 baris penuh (*full width*).
-  - Kolom **Postal Code** dan **Contact Number** disatukan dalam satu baris berdampingan (proporsi seimbang 1:1 atau 1:2).
+  - Kolom **Address** menggunakan elemen `<textarea>` (bukan input text 1 baris sempit) dan menempati 1 baris penuh (*full width*), sehingga nyaman saat pasien memasukkan alamat lengkap (nama blok, gedung, lantai, dan nomor unit).
+  - Kolom **Postal Code** dan **Contact Number** disatukan dalam satu baris berdampingan (*inline half-row*).
 * **Kriteria Penerimaan (Acceptance Criteria):**
-  - [ ] Alamat pasien memiliki ruang input yang panjang tanpa terpotong.
-  - [ ] Kode pos dan nomor kontak berada di satu baris yang rapi di layar desktop & tablet.
-  - [ ] Responsif pada layar HP (tetap rapi saat mengecil).
+  - [x] Alamat pasien menggunakan textarea responsif dengan ruang input luas dan dapat di-resize.
+  - [x] Kode pos dan nomor kontak berada di satu baris yang rapi di layar desktop & tablet.
+  - [x] Responsif pada layar HP (tetap rapi saat mengecil).
 
 ---
 
@@ -45,14 +45,16 @@
 
 ---
 
-### 4. [US-04] Tata Letak Sebaris (Inline Text) Kuesioner Medis untuk Menghemat Ruang
-* **Deskripsi:** Merapatkan tampilan teks bahasa Inggris dan Mandarin pada nama kondisi penyakit agar berada dalam satu baris (*inline*), sehingga mengurangi tinggi tabel dan meminimalkan *scrolling*.
+### 4. [US-04] Tata Letak Sebaris (Inline Text) Kuesioner Medis & Bahasa Murni Bilingual
+* **Deskripsi:** Merapatkan tampilan teks bahasa Inggris dan Mandarin pada nama kondisi penyakit agar berada dalam satu baris (*inline*), serta menghapus opsi Bahasa Indonesia agar murni dwi-bahasa (English & Chinese / 英文与中文) sesuai operasional klinik Singapura.
 * **Kebutuhan Teknis:**
-  - Teks kondisi ditampilkan sebaris (contoh: `a) Heart diseases 心脏病` atau dengan badge pemisah yang ringkas).
+  - Teks kondisi ditampilkan sebaris (contoh: `a) Heart diseases 心脏病`).
+  - Menghapus seluruh elemen dan opsi bahasa Indonesia dari antarmuka web, kamus JS, dan struktur form.
   - Mengurangi padding vertikal tabel tanpa mengorbankan keterbacaan.
 * **Kriteria Penerimaan (Acceptance Criteria):**
-  - [ ] Kuesioner medis tampil lebih ringkas dan padat.
-  - [ ] Pengguna tidak perlu melakukan *scroll* yang terlalu panjang di iPad/HP.
+  - [x] Kuesioner medis tampil lebih ringkas dan padat.
+  - [x] Hanya tersedia opsi Bahasa Inggris, Mandarin, dan Campuran (Bilingual).
+  - [x] Pengguna tidak perlu melakukan *scroll* yang terlalu panjang di iPad/HP.
 
 ---
 

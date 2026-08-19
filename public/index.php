@@ -158,7 +158,8 @@ if (empty($_SESSION['csrf_token'])) {
         }
         input[type="text"],
         input[type="date"],
-        input[type="tel"] {
+        input[type="tel"],
+        textarea {
             width: 100%;
             padding: 10px 12px;
             border: 1.5px solid #94a3b8;
@@ -167,12 +168,14 @@ if (empty($_SESSION['csrf_token'])) {
             color: #0f172a;
             background-color: #ffffff;
             box-sizing: border-box;
+            font-family: inherit;
             -webkit-appearance: none;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         input[type="text"]:focus,
         input[type="date"]:focus,
-        input[type="tel"]:focus {
+        input[type="tel"]:focus,
+        textarea:focus {
             border-color: #1b4965;
             box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.15);
             outline: none;
@@ -498,13 +501,13 @@ if (empty($_SESSION['csrf_token'])) {
                 <div class="input-wrapper"><input type="text" id="patient_nric" name="patient_nric" required></div>
             </div>
 
-            <div class="form-group">
-                <label for="patient_address">
+            <div class="form-group" style="align-items: flex-start;">
+                <label for="patient_address" style="margin-top: 8px;">
                     <span class="lang-inline lang-en">Address </span>
                     <span class="lang-inline lang-zh">地址:</span>
                 </label>
                 <div class="input-wrapper">
-                    <input type="text" id="patient_address" name="patient_address" required>
+                    <textarea id="patient_address" name="patient_address" rows="2" style="resize: vertical; line-height: 1.4;" placeholder="e.g. Blk 123 Ang Mo Kio Ave 4 #08-99" required></textarea>
                 </div>
             </div>
 
