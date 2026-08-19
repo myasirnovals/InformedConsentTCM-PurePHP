@@ -42,9 +42,9 @@ Fitur Utama:
 - Pengambilan Tanda Tangan Digital (Digital Signature Canvas) untuk Pasien/Wali 
   dan Praktisi TCM (Physician).
 - Basis Data Lokal SQLite yang mandiri (tanpa perlu instalasi server MySQL/PostgreSQL).
-- Generator PDF Otomatis Berbasis AcroForm & PyMuPDF yang memetakan data langsung 
+- Generator PDF Otomatis Berbasis 100% Pure PHP (FPDI + TCPDF) yang memetakan data langsung 
   ke dalam template dokumen resmi klinik serta menempelkan tanda tangan beresolusi tinggi 
-  tanpa background putih.
+  tanpa background putih (tanpa ketergantungan Python/eksternal runtime).
 - PWA Ready (Progressive Web App) dengan Service Worker dan Web Manifest.
 
 
@@ -54,22 +54,15 @@ Fitur Utama:
 Sebelum menjalankan aplikasi, pastikan perangkat komputer / server telah terpasang:
 
 A. PHP:
-   - Versi: PHP 7.4 atau PHP 8.0 / 8.1 / 8.2 / 8.3+
+   - Versi: PHP 7.4 atau PHP 8.0 / 8.1 / 8.2 / 8.3 / 8.4+
    - Ekstensi PHP yang Wajib Aktif:
      * pdo_sqlite (untuk koneksi SQLite)
      * sqlite3 (driver SQLite)
      * mbstring (untuk penanganan karakter multi-byte / teks Mandarin)
+     * gd (untuk manipulasi gambar/tanda tangan)
      * fileinfo (opsional)
 
-B. PYTHON:
-   - Versi: Python 3.8 / 3.9 / 3.10 / 3.11 / 3.12 / 3.14+
-   - Modul Python yang Wajib Terpasang:
-     * PyMuPDF (fitz) -> untuk memanipulasi & mengisi form PDF AcroForm
-     * Pillow (PIL)   -> untuk memproses transparansi & cropping tanda tangan
-   - Dapat diinstal dengan perintah:
-     pip install pymupdf pillow
-
-C. PERAMBAN WEB (BROWSER):
+B. PERAMBAN WEB (BROWSER):
    - Google Chrome, Mozilla Firefox, Microsoft Edge, atau Safari versi terbaru.
    - Sangat disarankan peramban dengan dukungan layar sentuh (Touch Screen) 
      jika diakses melalui iPad atau Tablet Android.
@@ -81,24 +74,19 @@ C. PERAMBAN WEB (BROWSER):
 
 LANGKAH 1: Persiapkan Source Code
 - Buka terminal / command prompt dan masuk ke direktori proyek:
-  cd c:\Users\hawki\Documents\KerjaPraktik\InformedConsentTCM
+  cd c:\path\ke\InformedConsentTCM-PurePHP
   (atau sesuaikan dengan folder letak proyek Anda)
 
-LANGKAH 2: Pastikan Ekstensi SQLite pada PHP Telah Aktif
+LANGKAH 2: Pastikan Ekstensi SQLite & GD pada PHP Telah Aktif
 - Buka file konfigurasi `php.ini` Anda (misal pada C:\xampp\php\php.ini atau instalasi PHP Anda).
 - Cari baris berikut dan pastikan tanda titik koma (;) di depannya sudah dihapus:
     extension=pdo_sqlite
     extension=sqlite3
     extension=mbstring
+    extension=gd
 - Simpan file `php.ini`.
 
-LANGKAH 3: Install Modul Python yang Diperlukan
-- Buka terminal / command prompt, lalu jalankan:
-    pip install pymupdf pillow
-- Untuk memastikan modul terpasang dengan benar, jalankan:
-    python -c "import pymupdf, PIL; print('Python dependencies OK!')"
-
-LANGKAH 4: Inisialisasi Database SQLite
+LANGKAH 3: Inisialisasi Database SQLite
 - Jalankan script inisialisasi database melalui terminal di direktori root proyek:
     php setup/init_db.php
 - Jika berhasil, terminal akan menampilkan pesan:
@@ -247,12 +235,10 @@ Aplikasi terdiri dari 5 bagian utama yang terstruktur secara berurutan:
 --------------------------------------------------------------------------------
 6. STRUKTUR DIREKTORI & PENJELASAN FILE
 --------------------------------------------------------------------------------
-
-InformedConsentTCM/
+InformedConsentTCM-PurePHP/
 │
-├── api/                               -> Core Backend Logic
-│   ├── generate_pdf.php               -> Handler pemanggil script Python PDF & streaming file
-│   ├── generate_pdf_acroform.py       -> Engine Python pengisi PDF template AcroForm & tanda tangan
+├── api/                               -> Core Backend Logic (Pure PHP)
+│   ├── generate_pdf.php               -> Handler pemanggil engine TcmPdfGenerator & streaming file PDF
 │   ├── submit_consent.php             -> Endpoint POST penyimpanan data pasien, riwayat, & tanda tangan
 │   └── submit_practitioner.php        -> Endpoint opsional tanda tangan terpisah oleh praktisi
 │
@@ -264,6 +250,10 @@ InformedConsentTCM/
 │   ├── en.php                         -> Terjemahan Bahasa Inggris
 │   └── zh.php                         -> Terjemahan Bahasa Mandarin
 │
+├── libs/                              -> Library Internal PHP
+│   ├── TcmPdfGenerator.php            -> Engine PDF Pure PHP (FPDI + TCPDF)
+│   └── tcpdf/                         -> TCPDF core engine & font library
+│
 ├── public/                            -> Document Root Web Server (Aset Publik)
 │   ├── api/                           -> Proxy routing API untuk akses publik
 │   │   ├── generate_pdf.php
@@ -274,8 +264,6 @@ InformedConsentTCM/
 │   ├── js/
 │   │   └── app.js                     -> Logika frontend, signature pad, validasi, & ajax submit
 │   ├── template/                      -> Template PDF Form Resmi Klinik
-│   │   ├── sctcm-treatment-template-read-only.pdf
-│   │   └── INFORMED-CONSENT.pdf
 │   ├── icon.svg                       -> Ikon aplikasi
 │   ├── manifest.json                  -> Konfigurasi PWA (Progressive Web App)
 │   ├── sw.js                          -> Service Worker untuk caching offline PWA
@@ -288,6 +276,7 @@ InformedConsentTCM/
 │   ├── consent.db                     -> File database SQLite utama
 │   ├── signatures/                    -> File gambar tanda tangan digital (.png)
 │   ├── pdf/                           -> File PDF hasil generate (.pdf)
+│   ├── pdf_templates/                 -> Template acuan PDF
 │   └── logs/                          -> Log aplikasi (app.log)
 │
 ├── Documentation/                     -> Dokumentasi Proyek
@@ -298,6 +287,7 @@ InformedConsentTCM/
 │   └── PANDUAN_MENJALANKAN_PROYEK.txt  -> File panduan ini
 │
 ├── composer.json                      -> Konfigurasi dependency PHP (opsional)
+├── Dockerfile                         -> Konfigurasi container Apache PHP Pure
 └── vercel.json                        -> Konfigurasi deployment serverless (opsional)
 
 
@@ -305,25 +295,26 @@ InformedConsentTCM/
 7. PANDUAN PEMELIHARAAN & TROUBLESHOOTING (FAQ)
 --------------------------------------------------------------------------------
 
-Q1: Kenapa saat tombol "Download PDF" diklik muncul pesan "Failed to execute python script" atau error 500?
+Q1: Kenapa saat tombol "Download PDF" diklik muncul pesan error atau file tidak terunduh?
 A1: Penyebab dan Solusi:
-    1. Pastikan Python sudah terpasang dan dapat dipanggil melalui terminal dengan mengetik `python --version`.
-    2. Pastikan paket `pymupdf` dan `pillow` sudah diinstall:
-       pip install pymupdf pillow
-    3. Periksa file log di `storage/logs/app.log` untuk melihat detail pesan kesalahan Python.
-    4. Pastikan file template PDF di `public/template/` tersedia dan tidak terhapus.
+    1. Pastikan folder `storage/pdf/` dan `storage/logs/` memiliki hak akses tulis (write permission).
+    2. Periksa file log di `storage/logs/app.log` untuk melihat detail pesan kesalahan PHP.
+    3. Pastikan file template PDF di `storage/pdf_templates/` atau `public/template/` tersedia.
+    4. Pastikan ekstensi `mbstring` dan `gd` pada PHP aktif.
 
 Q2: Muncul error "could not find driver" saat menjalankan `php setup/init_db.php`?
 A2: Ekstensi PDO SQLite di PHP belum aktif.
     Buka `php.ini`, hilangkan tanda titik koma (;) pada baris:
     extension=pdo_sqlite
     extension=sqlite3
+    extension=mbstring
     Lalu simpan dan jalankan kembali script setup.
 
 Q3: Bagaimana cara melihat data yang sudah masuk ke database SQLite?
 A3: Anda dapat menggunakan aplikasi visual gratis seperti:
     - DB Browser for SQLite (https://sqlitebrowser.org/)
     - Ekstensi "SQLite Viewer" di VS Code
+    - DBeaver / TablePlus
     Buka file `storage/consent.db` menggunakan aplikasi tersebut untuk melihat 
     tabel `consent_forms`, `patients`, `guardians`, `medical_answers`, `signatures`, dan `audit_logs`.
 
@@ -335,11 +326,11 @@ A4: Jika Anda ingin mereset data:
 
 Q5: Bagaimana jika aplikasi ingin di-deploy ke server online / hosting?
 A5: Pastikan server hosting Anda:
-    - Mendukung PHP 7.4+ dengan ekstensi SQLite3 aktif.
-    - Memiliki akses eksekusi shell (`shell_exec` aktif di hosting/VPS) dengan Python 3 terinstall.
+    - Mendukung PHP 7.4+ (atau PHP 8.1 / 8.2 / 8.3+) dengan ekstensi SQLite3, PDO SQLite, mbstring, dan GD aktif.
+    - 100% Pure PHP Native: Tidak membutuhkan Python, pip, shell_exec, atau binary eksternal tambahan.
     - Pastikan folder `storage/` memiliki hak akses tulis (write permission / chmod 775 atau 777).
 
 ================================================================================
 Dibuat untuk Tim Pengembang & Staf Klinik TCM
-Sistem TCM Digital Informed Consent App
+Sistem TCM Digital Informed Consent App (Pure PHP)
 ================================================================================

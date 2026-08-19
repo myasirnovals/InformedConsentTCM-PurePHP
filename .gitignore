@@ -4,12 +4,6 @@ composer.phar
 cacert.pem
 
 
-# Python artifacts
-__pycache__/
-*.py[cod]
-*$py.class
-*.pyc
-
 # Database and Storage
 storage/signatures/*
 !storage/signatures/.gitkeep
@@ -31,7 +25,6 @@ storage/consent.db
 test*.pdf
 test*.png
 diff*.txt
-diff*.py
 *.bak
 *.swp
 *.log
