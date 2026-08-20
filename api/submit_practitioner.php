@@ -1,8 +1,9 @@
 <?php
+require_once __DIR__ . '/../libs/bootstrap.php';
 header('Content-Type: application/json');
 
-$dbPath = __DIR__ . '/../storage/consent.db';
-$sigDir = __DIR__ . '/../storage/signatures';
+$storageDir = getTcmStorageDir();
+$sigDir = $storageDir . '/signatures';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
@@ -10,9 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $pdo = new PDO("sqlite:" . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('PRAGMA journal_mode=WAL;');
+    $pdo = getTcmDatabase();
     
     $consentId = trim($_POST['token'] ?? '');
     $practitionerName = trim($_POST['practitioner_name'] ?? '');

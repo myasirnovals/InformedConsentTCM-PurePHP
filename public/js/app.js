@@ -227,7 +227,7 @@ if (consentForm) {
         formData.append('lang', i18n.lang);
         
         // Send data to backend API
-        fetch('../api/submit_consent.php', {
+        fetch('/api/submit_consent.php', {
             method: 'POST',
             body: formData
         })
@@ -271,7 +271,7 @@ if (practitionerForm) {
         
         const formData = new FormData(this);
         
-        fetch('../api/submit_practitioner.php', {
+        fetch('/api/submit_practitioner.php', {
             method: 'POST',
             body: formData
         })

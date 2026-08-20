@@ -14,14 +14,15 @@ class TcmPdfGenerator
     public function __construct(PDO $pdo, $storageDir = null, $templatePath = null)
     {
         $this->pdo = $pdo;
-        $this->storageDir = $storageDir ?? realpath(__DIR__ . '/../storage');
+        $this->storageDir = $storageDir ?? (function_exists('getTcmStorageDir') ? getTcmStorageDir() : __DIR__ . '/../storage');
         $this->templatePath = $templatePath;
 
         if (!$this->templatePath) {
             $candidates = [
-                realpath(__DIR__ . '/../public/template/sctcm-treatment-template-read-only.pdf'),
-                realpath(__DIR__ . '/../public/template/sctcm-treatment.pdf'),
-                realpath(__DIR__ . '/../public/template/INFORMED-CONSENT.pdf'),
+                __DIR__ . '/../public/template/sctcm-treatment-template-read-only.pdf',
+                __DIR__ . '/../public/template/sctcm-treatment.pdf',
+                __DIR__ . '/../public/template/INFORMED-CONSENT.pdf',
+                __DIR__ . '/../storage/pdf_templates/INFORMED-CONSENT-FILLABLE.pdf',
             ];
             foreach ($candidates as $cand) {
                 if ($cand && file_exists($cand)) {

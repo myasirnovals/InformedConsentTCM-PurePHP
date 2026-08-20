@@ -1,33 +1,26 @@
 <?php
-session_start();
+require_once __DIR__ . '/../libs/bootstrap.php';
+require_once __DIR__ . '/../libs/TcmPdfGenerator.php';
 
 $token = $_GET['token'] ?? null;
 if (!$token) {
+    http_response_code(400);
     die("Error: Token tidak diberikan.");
 }
 
-// Ensure storage directories exist
-$base_dir = __DIR__;
-$pdf_dir = $base_dir . '/../storage/pdf/';
-$log_dir = $base_dir . '/../storage/logs/';
-
-if (!file_exists($pdf_dir)) mkdir($pdf_dir, 0777, true);
-if (!file_exists($log_dir)) mkdir($log_dir, 0777, true);
+$storageDir = getTcmStorageDir();
+$pdf_dir = $storageDir . '/pdf/';
+$log_dir = $storageDir . '/logs/';
 
 function writeLog($msg) {
     global $log_dir;
-    file_put_contents($log_dir . 'app.log', date('Y-m-d H:i:s') . " - " . $msg . PHP_EOL, FILE_APPEND);
+    @file_put_contents($log_dir . 'app.log', date('Y-m-d H:i:s') . " - " . $msg . PHP_EOL, FILE_APPEND);
 }
 
-// 100% Pure PHP PDF Generator (FPDI + TCPDF)
-require_once __DIR__ . '/../libs/TcmPdfGenerator.php';
-
 try {
-    $dbPath = __DIR__ . '/../storage/consent.db';
-    $pdo = new PDO("sqlite:" . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getTcmDatabase();
 
-    $generator = new TcmPdfGenerator($pdo);
+    $generator = new TcmPdfGenerator($pdo, $storageDir);
     $pdfPath = $generator->generate($token);
 
     if (!file_exists($pdfPath)) {

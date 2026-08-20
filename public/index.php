@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../libs/bootstrap.php';
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -1035,7 +1035,7 @@ if (empty($_SESSION['csrf_token'])) {
         const formData = new FormData(form);
 
         // Submit via AJAX
-        fetch('../api/submit_consent.php', {
+        fetch('/api/submit_consent.php', {
             method: 'POST',
             body: formData
         })
@@ -1048,7 +1048,7 @@ if (empty($_SESSION['csrf_token'])) {
                         <p>${data.message}</p>
                         <p>${getTranslation('consent_id')} <strong>${data.token}</strong></p>
                         <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
-                            <a href="../api/generate_pdf.php?token=${data.token}" target="_blank" style="text-decoration: none; background-color: #1b4965; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold;">${getTranslation('download_pdf')}</a>
+                            <a href="/api/generate_pdf.php?token=${data.token}" target="_blank" style="text-decoration: none; background-color: #1b4965; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold;">${getTranslation('download_pdf')}</a>
                             <button onclick="window.location.href = window.location.pathname + '?reset=' + Date.now()" style='padding: 10px 20px; cursor: pointer; background-color: #64748b; color: white; border: none; border-radius: 6px; font-weight: bold;'>${getTranslation('new_form')}</button>
                         </div>
                     </div>`;

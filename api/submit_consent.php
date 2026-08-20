@@ -1,18 +1,11 @@
 <?php
+require_once __DIR__ . '/../libs/bootstrap.php';
 header('Content-Type: application/json');
 
-// 1. Determine storage directory (Support Vercel Serverless /tmp and Local Hosting)
-$isVercel = getenv('VERCEL') || isset($_SERVER['VERCEL']) || !is_writable(__DIR__ . '/../storage');
-$baseStorage = $isVercel ? sys_get_temp_dir() . '/tcm_storage' : __DIR__ . '/../storage';
-
-$dbPath = $baseStorage . '/consent.db';
-$sigDir = $baseStorage . '/signatures';
-$pdfDir = $baseStorage . '/pdf';
-$logDir = $baseStorage . '/logs';
-
-if (!file_exists($sigDir)) mkdir($sigDir, 0777, true);
-if (!file_exists($pdfDir)) mkdir($pdfDir, 0777, true);
-if (!file_exists($logDir)) mkdir($logDir, 0777, true);
+$storageDir = getTcmStorageDir();
+$sigDir = $storageDir . '/signatures';
+$pdfDir = $storageDir . '/pdf';
+$logDir = $storageDir . '/logs';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
@@ -20,65 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $pdo = new PDO("sqlite:" . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('PRAGMA journal_mode=WAL;');
-
-    // Auto-create SQLite tables if they do not exist (Critical for Vercel /tmp)
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS consent_forms (
-            id TEXT PRIMARY KEY,
-            status TEXT NOT NULL DEFAULT 'draft',
-            language TEXT NOT NULL,
-            consent_version TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            completed_at DATETIME NULL
-        );
-        CREATE TABLE IF NOT EXISTS patients (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consent_id TEXT NOT NULL,
-            name TEXT NOT NULL,
-            nric TEXT NOT NULL,
-            address TEXT NOT NULL,
-            postal_code TEXT NOT NULL,
-            contact_number TEXT NOT NULL,
-            gender TEXT NOT NULL,
-            date_of_birth DATE NOT NULL,
-            FOREIGN KEY (consent_id) REFERENCES consent_forms(id) ON DELETE CASCADE
-        );
-        CREATE TABLE IF NOT EXISTS guardians (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consent_id TEXT NOT NULL,
-            name TEXT NOT NULL,
-            nric TEXT NOT NULL,
-            relationship TEXT NOT NULL,
-            FOREIGN KEY (consent_id) REFERENCES consent_forms(id) ON DELETE CASCADE
-        );
-        CREATE TABLE IF NOT EXISTS medical_answers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consent_id TEXT NOT NULL,
-            question_code TEXT NOT NULL,
-            answer TEXT NOT NULL,
-            specification TEXT,
-            FOREIGN KEY (consent_id) REFERENCES consent_forms(id) ON DELETE CASCADE
-        );
-        CREATE TABLE IF NOT EXISTS signatures (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consent_id TEXT NOT NULL,
-            type TEXT NOT NULL,
-            image_path TEXT NOT NULL,
-            signed_by TEXT NOT NULL,
-            signed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (consent_id) REFERENCES consent_forms(id) ON DELETE CASCADE
-        );
-        CREATE TABLE IF NOT EXISTS audit_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consent_id TEXT NOT NULL,
-            event TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (consent_id) REFERENCES consent_forms(id) ON DELETE CASCADE
-        );
-    ");
+    $pdo = getTcmDatabase();
 
     // 1. Generate unique consent ID
     $consentId = bin2hex(random_bytes(16));
