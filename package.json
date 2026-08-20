@@ -1,0 +1,8 @@
+{
+  "name": "informed-consent-tcm-pure-php",
+  "version": "1.0.0",
+  "description": "TCM Informed Consent Pure PHP",
+  "engines": {
+    "node": "18.x"
+  }
+}
