@@ -9,7 +9,7 @@ Get-Process -Name php, ngrok -ErrorAction SilentlyContinue | Stop-Process -Force
 
 # 2. Jalankan PHP Server di Background
 Write-Host "[*] Memulai PHP Server di port 8000..." -ForegroundColor Yellow
-Start-Process -FilePath "php" -ArgumentList "-S localhost:8000 -t public" -WindowStyle Hidden
+Start-Process -FilePath "php" -ArgumentList "-S localhost:8000 router.php" -WindowStyle Hidden
 
 Start-Sleep -Seconds 2
 

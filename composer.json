@@ -1,9 +1,8 @@
 {
+    "name": "tcm/informed-consent",
+    "description": "TCM Informed Consent Pure PHP",
+    "type": "project",
     "require": {
-        "mpdf/mpdf": "^8.2"
-    },
-    "config": {
-        "disable-tls": true,
-        "cafile": "cacert.pem"
+        "php": ">=7.4"
     }
 }

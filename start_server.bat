@@ -17,7 +17,7 @@ cd /d "%~dp0"
 
 :: 3. Jalankan PHP Built-in Server di jendela terpisah
 echo [*] Memulai PHP Server (localhost:8000)...
-start "TCM - PHP Server" /MIN cmd /c "php -S localhost:8000 -t public"
+start "TCM - PHP Server" /MIN cmd /c "php -S localhost:8000 router.php"
 
 :: Tunggu 2 detik agar PHP siap
 timeout /t 2 /nobreak >nul

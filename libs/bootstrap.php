@@ -1,30 +1,17 @@
 <?php
 // Unified Environment Bootstrap for Local & Vercel Serverless
 
-// Error handling configuration
-ini_set('display_errors', '0');
+// Error handling configuration: display errors for debugging
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
-// Ensure session directory is writable in Serverless / Lambda (/tmp)
-if (session_status() === PHP_SESSION_NONE) {
-    $tempSession = sys_get_temp_dir() . '/tcm_sessions';
-    if (!file_exists($tempSession)) {
-        @mkdir($tempSession, 0777, true);
-    }
-    if (is_dir($tempSession) && is_writable($tempSession)) {
-        @session_save_path($tempSession);
-    } elseif (is_writable(sys_get_temp_dir())) {
-        @session_save_path(sys_get_temp_dir());
-    }
-    @session_start();
-}
 
 /**
  * Returns dynamic writable storage directory (Local or Vercel Serverless /tmp)
  */
 function getTcmStorageDir() {
     $localDir = dirname(__DIR__) . '/storage';
-    $isVercel = getenv('VERCEL') || isset($_SERVER['VERCEL']) || !is_writable($localDir);
+    $isVercel = getenv('VERCEL') || isset($_SERVER['VERCEL']) || (isset($_ENV['VERCEL']) && $_ENV['VERCEL']) || !is_writable($localDir);
     $dir = $isVercel ? sys_get_temp_dir() . '/tcm_storage' : $localDir;
 
     if (!file_exists($dir)) @mkdir($dir, 0777, true);
@@ -44,7 +31,8 @@ function getTcmDatabase() {
 
     $pdo = new PDO("sqlite:" . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('PRAGMA journal_mode=WAL;');
+    $pdo->exec('PRAGMA busy_timeout = 5000;');
+    $pdo->exec('PRAGMA journal_mode = MEMORY;');
 
     // Auto-create SQLite tables if they do not exist
     $pdo->exec("

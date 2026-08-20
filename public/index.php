@@ -4,9 +4,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+$csrfToken = bin2hex(random_bytes(16));
 ?>
 
 <!DOCTYPE html>
@@ -474,7 +472,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 <div class="form-container">
     <form id="consentForm">
-        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
         <div class="header">
             <h1 class="lang-elem lang-en">SIAH AH CHEOK CHINESE SIN-SEH CLINIC</h1>
             <h2 class="lang-elem lang-zh">谢存灼中医诊所</h2>
