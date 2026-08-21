@@ -92,3 +92,82 @@ function getTcmDatabase() {
 
     return $pdo;
 }
+
+/**
+ * Flattens an RGBA 32-bit transparent PNG onto a clean white background in Pure PHP (zero dependencies)
+ * to ensure 100% compatibility with TCPDF without producing solid black rectangles.
+ */
+function flattenPngAlphaToRgb($pngBinaryOrPath, $targetPath = null) {
+    $raw = file_exists($pngBinaryOrPath) ? file_get_contents($pngBinaryOrPath) : $pngBinaryOrPath;
+    if (substr($raw, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+        if ($targetPath) file_put_contents($targetPath, $raw);
+        return $raw;
+    }
+
+    $pos = 8;
+    $len_raw = strlen($raw);
+    $idat = "";
+    $w = 0; $h = 0; $colorType = 0;
+    while ($pos < $len_raw) {
+        if ($pos + 8 > $len_raw) break;
+        $len = unpack("N", substr($raw, $pos, 4))[1];
+        $type = substr($raw, $pos + 4, 4);
+        $data = substr($raw, $pos + 8, $len);
+        if ($type === "IHDR") {
+            $w = unpack("N", substr($data, 0, 4))[1];
+            $h = unpack("N", substr($data, 4, 4))[1];
+            $colorType = ord($data[9]);
+        } elseif ($type === "IDAT") {
+            $idat .= $data;
+        }
+        $pos += 12 + $len;
+    }
+
+    // If not RGBA (ColorType 6), it's already RGB or indexed
+    if ($colorType !== 6 || empty($idat)) {
+        if ($targetPath) file_put_contents($targetPath, $raw);
+        return $raw;
+    }
+
+    $uncompressed = @gzuncompress($idat);
+    if ($uncompressed === false) {
+        if ($targetPath) file_put_contents($targetPath, $raw);
+        return $raw;
+    }
+
+    $out_raw = "";
+    $src_pos = 0;
+
+    for ($y = 0; $y < $h; $y++) {
+        if ($src_pos >= strlen($uncompressed)) break;
+        $filter = ord($uncompressed[$src_pos++]);
+        $out_raw .= chr(0); // None filter
+        for ($x = 0; $x < $w; $x++) {
+            if ($src_pos + 3 >= strlen($uncompressed)) break;
+            $r = ord($uncompressed[$src_pos++]);
+            $g = ord($uncompressed[$src_pos++]);
+            $b = ord($uncompressed[$src_pos++]);
+            $a = ord($uncompressed[$src_pos++]);
+
+            $alpha = $a / 255.0;
+            $out_r = (int)round(($r * $alpha) + (255 * (1.0 - $alpha)));
+            $out_g = (int)round(($g * $alpha) + (255 * (1.0 - $alpha)));
+            $out_b = (int)round(($b * $alpha) + (255 * (1.0 - $alpha)));
+
+            $out_raw .= chr($out_r) . chr($out_g) . chr($out_b);
+        }
+    }
+
+    $ihdr = pack("NNCCCCC", $w, $h, 8, 2, 0, 0, 0); // 8-bit RGB
+    $ihdr_chunk = pack("N", 13) . "IHDR" . $ihdr . pack("N", crc32("IHDR" . $ihdr));
+    $idat_data = gzcompress($out_raw, 9);
+    $idat_chunk = pack("N", strlen($idat_data)) . "IDAT" . $idat_data . pack("N", crc32("IDAT" . $idat_data));
+    $iend_chunk = pack("N", 0) . "IEND" . pack("N", crc32("IEND"));
+
+    $png_out = "\x89PNG\r\n\x1a\n" . $ihdr_chunk . $idat_chunk . $iend_chunk;
+    if ($targetPath) {
+        file_put_contents($targetPath, $png_out);
+    }
+    return $png_out;
+}
+

@@ -1,9 +1,0 @@
-.git
-.vscode
-.idea
-*.log
-scratch/
-test*.pdf
-test*.png
-diff*.txt
-Documentation/

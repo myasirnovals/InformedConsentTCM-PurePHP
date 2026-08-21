@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Questionnaire TCM</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      background: #f2f2f2;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .page {
+      width: 794px;
+      min-height: 1123px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 28px 34px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .clinic-name {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .title-cn {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .title-en {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 1.1fr;
+      gap: 8px 16px;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .field label {
+      font-weight: 700;
+    }
+
+    .line {
+      flex: 1;
+      height: 15px;
+      background: #f2f5fb;
+      border-bottom: 1px solid transparent;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .declaration-list {
+      padding-left: 18px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .declaration-list li {
+      margin-bottom: 7px;
+      padding-left: 3px;
+    }
+
+    .cn {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .en {
+      display: block;
+    }
+
+    .note {
+      margin: 8px 0;
+    }
+
+    .medical-title {
+      font-weight: 700;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .question-list {
+      list-style-position: outside;
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .question-list li {
+      margin-bottom: 7px;
+      padding-left: 4px;
+      display: list-item;
+    }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: 1fr 84px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .answer-box {
+      height: 18px;
+      background: #f2f5fb;
+    }
+
+    .specify {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+      margin-left: 0;
+    }
+
+    .specify span {
+      white-space: nowrap;
+    }
+
+    .specify-line {
+      width: 180px;
+      height: 15px;
+      border-bottom: 1px dotted #777;
+    }
+
+    .women-title {
+      font-weight: 700;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .textarea-line {
+      width: 100%;
+      height: 42px;
+      background: #f2f5fb;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .consent-text {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .signature-section {
+      margin-top: 36px;
+    }
+
+    .signature-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      column-gap: 18px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    .signature-line {
+      border-bottom: 1px solid #000;
+      height: 26px;
+      position: relative;
+    }
+
+    .signature-label {
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .full-line {
+      border-bottom: 1px solid #000;
+      height: 28px;
+      margin-top: 18px;
+    }
+
+    .footer-signature {
+      margin-top: 48px;
+    }
+
+    .small-box {
+      width: 110px;
+      height: 18px;
+      background: #f2f5fb;
+      margin: 0 auto;
+    }
+
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      background: #f2f5fb;
+      display: inline-block;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="clinic-name">
+      SIAH AH CHEOK CHINESE SIN-SEH CLINIC 谢存灼中医诊所
+    </div>
+
+    <div class="title-cn">
+      客户健康问卷（中医）
+    </div>
+
+    <div class="title-en">
+      HEALTH QUESTIONNAIRE (TCM)
+    </div>
+
+    <div class="info-grid">
+      <div class="field">
+        <label>患者姓名 Patient Name :</label>
+        <div class="line"></div>
+      </div>
+
+      <div class="field">
+        <label>性别 Sex :</label>
+        <div class="line"></div>
+      </div>
+
+      <div class="field">
+        <label>居民证号码 NRIC No :</label>
+        <div class="line"></div>
+      </div>
+
+      <div class="field">
+        <label>出生日期 Date of Birth :</label>
+        <div class="line"></div>
+      </div>
+
+      <div></div>
+
+      <div class="field">
+        <label>联络号码 Contact No :</label>
+        <div class="line"></div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      客户声明:
+      <br />
+      Declaration :
+    </div>
+
+    <ol class="declaration-list">
+      <li>
+        <span class="cn">
+          本人提供的上述信息是完整和准确的，并无隐瞒可能影响治疗安全性的事实。
+        </span>
+        <span class="en">
+          I acknowledge that the above information given by me is complete and accurate to the best of my knowledge and that no fact that is likely to influence the safety of the treatment(s) that I have signed up for have been withheld.
+        </span>
+      </li>
+
+      <li>
+        <span class="cn">
+          本人征求及同意接受注册中医师所推荐的中医治疗方案，包括但不限于病历记录、针灸、电针治疗、艾灸、温针灸、推拿、拔罐及中药处方等。
+        </span>
+        <span class="en">
+          I hereby request and consent to the performance of Traditional Chinese Medicine treatments as recommended by the registered TCM Practitioner, including but not limited to history-taking, acupuncture, electroacupuncture, indirect moxibustion, warm needle moxibustion, Tuina, cupping, and herbal prescriptions.
+        </span>
+      </li>
+
+      <li>
+        <span class="cn">
+          本人经注册中医师解释并了解以上治疗时或延后有可能出现，出血、瘀血、肿痛、皮肤红晕、小水泡、眩晕、惊厥、烧伤、烫伤、滞针、弯针、断针、气胸等状况。
+        </span>
+        <span class="en">
+          I have been informed and understand the possible risks and complications that may arise during or after the above-said treatment, including but not limited to bleeding, bruising, swelling, pain, skin redness, small blisters, fainting/dizziness, convulsions, burnt, scald, stuck, bent or broken needle, pneumothorax.
+        </span>
+      </li>
+
+      <li>
+        <span class="cn">
+          本人深切了解并不期望注册中医师能预知并解释所有的治疗风险及预后状况。
+        </span>
+        <span class="en">
+          I understand that the registered TCM Practitioner may not be able to anticipate and explain to me each and every possible risk and complication of the above-said treatments.
+        </span>
+      </li>
+
+      <li>
+        <span class="cn">
+          本人应向注册中医师探询所有有关治疗及预后的疑问。
+        </span>
+        <span class="en">
+          I understand that should I have any doubt or query, I may ask the registered TCM Practitioner for more information on the above-said TCM treatments and their possible risks and complications.
+        </span>
+      </li>
+    </ol>
+
+    <div class="note">
+      请针对以下问题作答。<br />
+      Please answer the following questions.
+    </div>
+
+    <div class="note">
+      年龄低于 18 岁或因身体或精神状况无法填写此问卷的客户可由家长、配偶、亲属或被授权者代表填写。
+      <br />
+      For any customer under the age of 18 or who are unable to complete this questionnaire due to a physical or mental condition, this questionnaire may be completed by the customer's parent, spouse, relative or authorized representative.
+    </div>
+
+    <div class="medical-title">
+      病史:
+      <br />
+      Medical History:
+    </div>
+
+    <ol class="question-list">
+      <li>
+        <div class="question-row">
+          <span>心脏病 Heart diseases.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>装上心脏起搏器 Implantation of cardiac pacemaker.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>糖尿病 Diabetes.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>高血压 High blood pressure.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>高胆固醇 High cholesterol.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>癌症 Cancer.</span>
+          <span class="answer-box"></span>
+        </div>
+        <div class="specify">
+          <span>Specify :</span>
+          <div class="specify-line"></div>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>皮肤敏感 Sensitive skin.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>药物过敏 Allergies.</span>
+          <span class="answer-box"></span>
+        </div>
+        <div class="specify">
+          <span>Specify :</span>
+          <div class="specify-line"></div>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>艾滋病 HIV/AIDS.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>抽搐 Seizures.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>服用血薄药等抗凝血剂 Consumption of anti-coagulants.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>手术 Operation.</span>
+          <span class="answer-box"></span>
+        </div>
+        <div class="specify">
+          <span>Specify :</span>
+          <div class="specify-line"></div>
+        </div>
+      </li>
+
+      <li>
+        <div class="question-row">
+          <span>异常出血 Abnormal bleeding.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="women-title">
+      女性客户。<br />
+      For Women Only.
+    </div>
+
+    <ol class="question-list" start="14">
+      <li>
+        <div class="question-row">
+          <span>目前怀孕 Currently pregnant.</span>
+          <span class="answer-box"></span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="note">
+      若有其它医师须知的情况，请在以下注明 If there are other conditions that you wish to inform the physician,
+      please indicate below：
+    </div>
+
+    <div class="textarea-line"></div>
+
+    <div class="consent-text">
+      本人确定所提供的信息准确，本人已阅读并理解以上条文，本人谨此同意并授权进行此项治疗。
+      <br />
+      I declare that the above information provided by me are true and to the best of my knowledge. I have carefully read and understood all the above information. I have give my consent to the treatments. I hereby give my permission and consent to the treatment.
+    </div>
+
+    <div class="consent-text">
+      当患者年龄低于18岁或因身体状况无法签署以上同意书，可由家长、配偶、亲戚或被授权者代表患者签署同意书。
+      <br />
+      This consent form may be signed by patient's representative e.g. parents, spouse, relatives or authorized.
+    </div>
+
+    <div class="signature-section">
+      <div class="signature-row">
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            患者代表签名 Signature of Patient's Representative.
+          </div>
+        </div>
+
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            日期 Date.
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="full-line"></div>
+        <div class="signature-label">
+          患者代表姓名/与患者关系 Name of Patient's Representative and Relationship to Patient.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-signature">
+      <div class="signature-row">
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            当值医师姓名/签名 Name of duty Physician/Signature.
+          </div>
+        </div>
+
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            日期 Date.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

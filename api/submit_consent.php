@@ -121,7 +121,7 @@ try {
 
     $fileName = 'sig_' . $consentId . '_patient.png';
     $filePath = $sigDir . '/' . $fileName;
-    if (file_put_contents($filePath, $data) === false) {
+    if (flattenPngAlphaToRgb($data, $filePath) === false) {
         throw new Exception("Failed to save signature image.");
     }
 
@@ -143,7 +143,7 @@ try {
 
     $fileName2 = 'sig_' . $consentId . '_practitioner.png';
     $filePath2 = $sigDir . '/' . $fileName2;
-    if (file_put_contents($filePath2, $data2) === false) {
+    if (flattenPngAlphaToRgb($data2, $filePath2) === false) {
         throw new Exception("Failed to save practitioner signature image.");
     }
 

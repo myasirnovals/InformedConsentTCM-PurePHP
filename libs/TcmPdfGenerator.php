@@ -1,50 +1,27 @@
 <?php
 
 require_once __DIR__ . '/tcpdf/tcpdf.php';
-require_once __DIR__ . '/fpdi/autoload.php';
-
-use setasign\Fpdi\Tcpdf\Fpdi;
+require_once __DIR__ . '/bootstrap.php';
 
 class TcmPdfGenerator
 {
-    private $pdo;
-    private $storageDir;
-    private $templatePath;
+    private PDO $pdo;
+    private string $storageDir;
 
-    public function __construct(PDO $pdo, $storageDir = null, $templatePath = null)
+    public function __construct(PDO $pdo, ?string $storageDir = null)
     {
         $this->pdo = $pdo;
         $this->storageDir = $storageDir ?? (function_exists('getTcmStorageDir') ? getTcmStorageDir() : __DIR__ . '/../storage');
-        $this->templatePath = $templatePath;
-
-        if (!$this->templatePath) {
-            $candidates = [
-                __DIR__ . '/../public/template/sctcm-treatment-template-read-only.pdf',
-                __DIR__ . '/../public/template/sctcm-treatment.pdf',
-                __DIR__ . '/../public/template/INFORMED-CONSENT.pdf',
-                __DIR__ . '/../storage/pdf_templates/INFORMED-CONSENT-FILLABLE.pdf',
-            ];
-            foreach ($candidates as $cand) {
-                if ($cand && file_exists($cand)) {
-                    $this->templatePath = $cand;
-                    break;
-                }
-            }
-        }
     }
 
     /**
-     * Generate PDF for given consent token/ID with 100% exact 1:1 vector overlay and 12pt font
+     * Generate 100% Pure PHP PDF document from clean HTML/CSS template
      * @param string $token
      * @return string Path to generated PDF file
      * @throws Exception
      */
-    public function generate($token)
+    public function generate(string $token): string
     {
-        if (!$this->templatePath || !file_exists($this->templatePath)) {
-            throw new Exception("Template PDF klinik tidak ditemukan di public/template/");
-        }
-
         // 1. Fetch Patient
         $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE consent_id = ?");
         $stmt->execute([$token]);
@@ -76,62 +53,17 @@ class TcmPdfGenerator
             $signatures[$row['type']] = $row;
         }
 
-        // Prepare FPDI Instance with TCPDF
-        $pdf = new Fpdi('P', 'pt');
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->SetMargins(0, 0, 0, true);
-
-        // Font settings - 12pt font as requested
-        $fontChinese = 'cid0cs';
-        $pdf->SetTextColor(0, 0, 0);
-
-        $pageCount = $pdf->setSourceFile($this->templatePath);
-
-        // =========================================================================
-        // PAGE 1: PARTICULARS & Q1-Q2 (Exact 1:1 Native Dimensions)
-        // =========================================================================
-        $tplPage1 = $pdf->importPage(1);
-        $sizeP1 = $pdf->getTemplateSize($tplPage1);
-        $pdf->AddPage($sizeP1['orientation'], [$sizeP1['width'], $sizeP1['height']]);
-        $pdf->useTemplate($tplPage1, 0, 0, $sizeP1['width'], $sizeP1['height']);
-
-        // 1. Render template lines that used non-embedded fonts to guarantee 100% visibility
-        $pdf->SetFont($fontChinese, '', 12);
-        // Clause 2 English treatment line:
-        $pdf->SetXY(45, 327.5);
-        $pdf->Cell(520, 14, "acupuncture, electroacupuncture, indirect moxibustion, warm needle moxibustion, Tuina, cupping,", 0, 0, 'L');
-        
-        // Q2 line:
-        $pdf->SetXY(42, 727.5);
-        $pdf->Cell(450, 14, "2.   装上心脏起搏器 Implantation of cardiac pacemaker.", 0, 0, 'L');
-
-        // 2. Patient Particulars (12pt font)
-        $patientName = $patient['name'] ?? '';
-        $pdf->SetXY(136, 115.5);
-        $pdf->Cell(144, 12, $patientName, 0, 0, 'L');
-
-        // Sex (left aligned next to label)
+        // Prepare Variables for Template
+        $patientName = trim($patient['name'] ?? '');
         $gender = strtoupper(substr(trim($patient['gender'] ?? ''), 0, 1));
         if ($gender !== 'M' && $gender !== 'F') $gender = $patient['gender'] ?? '';
-        $pdf->SetXY(333, 115.5);
-        $pdf->Cell(30, 12, $gender, 0, 0, 'L');
+        $patientSex = ($gender === 'M') ? 'Male / 男' : (($gender === 'F') ? 'Female / 女' : $gender);
+        $patientNric = trim($patient['nric'] ?? '');
+        $patientDob = trim($patient['date_of_birth'] ?? '');
+        $patientContact = trim($patient['contact_number'] ?? '');
 
-        // NRIC
-        $pdf->SetXY(487, 115.5);
-        $pdf->Cell(98, 12, $patient['nric'] ?? '', 0, 0, 'L');
-
-        // DOB
-        $pdf->SetXY(153, 134.0);
-        $pdf->Cell(128, 12, $patient['date_of_birth'] ?? '', 0, 0, 'L');
-
-        // Contact Number
-        $pdf->SetXY(487, 134.0);
-        $pdf->Cell(98, 12, $patient['contact_number'] ?? '', 0, 0, 'L');
-
-        // Medical History Helper
-        $getAnswerText = function($key, $aliases = []) use ($medical) {
+        // Helper closures for answers & specifications
+        $getAns = function($key, $aliases = []) use ($medical) {
             $row = $medical[$key] ?? null;
             if (!$row && !empty($aliases)) {
                 foreach ($aliases as $alt) {
@@ -149,175 +81,86 @@ class TcmPdfGenerator
             return $ans;
         };
 
-        $getSpecification = function($key) use ($medical) {
+        $getSpec = function($key) use ($medical) {
             return trim($medical[$key]['specification'] ?? '');
         };
 
-        // Q1 Heart Disease [499.0, 712.0, 569.0, 723.0]
-        $pdf->SetXY(499, 712);
-        $pdf->Cell(70, 12, $getAnswerText('heart_disease', ['heart']), 0, 0, 'C');
-
-        // Q2 Pacemaker [499.0, 732.0, 569.0, 743.0]
-        $pdf->SetXY(499, 730);
-        $pdf->Cell(70, 12, $getAnswerText('pacemaker'), 0, 0, 'C');
-
-        // =========================================================================
-        // PAGE 2: Q3-Q14, DECLARATIONS & SIGNATURES (Exact 1:1 Native Dimensions)
-        // =========================================================================
-        if ($pageCount >= 2) {
-            $tplPage2 = $pdf->importPage(2);
-            $sizeP2 = $pdf->getTemplateSize($tplPage2);
-            $pdf->AddPage($sizeP2['orientation'], [$sizeP2['width'], $sizeP2['height']]);
-            $pdf->useTemplate($tplPage2, 0, 0, $sizeP2['width'], $sizeP2['height']);
-
-            $pdf->SetFont($fontChinese, '', 12);
-
-            // Q3 Diabetes
-            $pdf->SetXY(501, 35);
-            $pdf->Cell(71, 12, $getAnswerText('diabetes'), 0, 0, 'C');
-
-            // Q4 High Blood Pressure
-            $pdf->SetXY(501, 54);
-            $pdf->Cell(72, 12, $getAnswerText('high_blood_pressure', ['hbp']), 0, 0, 'C');
-
-            // Q5 High Cholesterol
-            $pdf->SetXY(501, 71);
-            $pdf->Cell(72, 12, $getAnswerText('high_cholesterol', ['cholesterol']), 0, 0, 'C');
-
-            // Q6 Cancer
-            $pdf->SetXY(502, 89);
-            $pdf->Cell(72, 12, $getAnswerText('cancer'), 0, 0, 'C');
-
-            // Cancer specify line
-            $specCancer = $getSpecification('cancer');
-            $pdf->SetXY(91.5, 103.5);
-            $pdf->Cell(50, 14, 'Specify : ', 0, 0, 'L');
-            if (!empty($specCancer)) {
-                $pdf->SetXY(142, 103.5);
-                $pdf->Cell(355, 14, $specCancer, 0, 0, 'L');
-            } else {
-                $pdf->SetXY(142, 103.5);
-                $pdf->Cell(355, 14, '................................................................................', 0, 0, 'L');
+        $renderSpecify = function($spec) {
+            if (!empty($spec)) {
+                return '<span style="color: #003366; font-weight: bold; text-decoration: underline;">&nbsp;&nbsp;' . htmlspecialchars($spec) . '&nbsp;&nbsp;</span>';
             }
+            return '<span style="color: #888888;">....................................................................</span>';
+        };
 
-            // Q7 Sensitive Skin
-            $pdf->SetXY(503, 125);
-            $pdf->Cell(71, 12, $getAnswerText('sensitive_skin', ['skin']), 0, 0, 'C');
-
-            // Q8 Allergies
-            $pdf->SetXY(503, 144);
-            $pdf->Cell(72, 12, $getAnswerText('allergies'), 0, 0, 'C');
-
-            // Allergies specify line
-            $specAllergies = $getSpecification('allergies');
-            $pdf->SetXY(91.5, 158.0);
-            $pdf->Cell(50, 14, 'Specify : ', 0, 0, 'L');
-            if (!empty($specAllergies)) {
-                $pdf->SetXY(142, 158.0);
-                $pdf->Cell(355, 14, $specAllergies, 0, 0, 'L');
-            } else {
-                $pdf->SetXY(142, 158.0);
-                $pdf->Cell(355, 14, '................................................................................', 0, 0, 'L');
-            }
-
-            // Q9 HIV / AIDS
-            $pdf->SetXY(504, 179);
-            $pdf->Cell(71, 12, $getAnswerText('hiv_aids', ['hiv']), 0, 0, 'C');
-
-            // Q10 Seizures
-            $pdf->SetXY(504, 196);
-            $pdf->Cell(72, 12, $getAnswerText('seizures'), 0, 0, 'C');
-
-            // Q11 Anti-coagulants
-            $pdf->SetXY(504, 215);
-            $pdf->Cell(72, 12, $getAnswerText('anti_coagulants', ['anticoagulants']), 0, 0, 'C');
-
-            // Q12 Operation
-            $pdf->SetXY(504, 232);
-            $pdf->Cell(72, 12, $getAnswerText('operation'), 0, 0, 'C');
-
-            // Operation specify line
-            $specOp = $getSpecification('operation');
-            $pdf->SetXY(91.5, 246.5);
-            $pdf->Cell(50, 14, 'Specify : ', 0, 0, 'L');
-            if (!empty($specOp)) {
-                $pdf->SetXY(142, 246.5);
-                $pdf->Cell(355, 14, $specOp, 0, 0, 'L');
-            } else {
-                $pdf->SetXY(142, 246.5);
-                $pdf->Cell(355, 14, '................................................................................', 0, 0, 'L');
-            }
-
-            // Q13 Abnormal Bleeding
-            $pdf->SetXY(504, 270);
-            $pdf->Cell(72, 12, $getAnswerText('abnormal_bleeding', ['bleeding']), 0, 0, 'C');
-
-            // Q14 Currently Pregnant
-            $pdf->SetXY(505, 319);
-            $pdf->Cell(72, 12, $getAnswerText('currently_pregnant', ['pregnant']), 0, 0, 'C');
-
-            // Other Conditions
-            if (isset($medical['others']) && !empty($medical['others']['specification'])) {
-                $specOthers = trim($medical['others']['specification']);
-                $pdf->SetXY(24, 370);
-                $pdf->MultiCell(546, 14, $specOthers, 0, 'L');
-            }
-
-            $signaturesDir = $this->storageDir . '/signatures';
-
-            // --- Patient / Representative Signature ---
-            if (isset($signatures['patient'])) {
-                $sigFile = $signaturesDir . '/' . $signatures['patient']['image_path'];
-                if (file_exists($sigFile)) {
-                    // Position above line y=586
-                    $pdf->Image($sigFile, 35, 538, 180, 45, 'PNG', '', '', false, 300, '', false, false, 0, 'CM');
+        // Signatures files & dates
+        $signaturesDir = $this->storageDir . '/signatures';
+        $patientSigFile = null;
+        $patientSigDate = date('Y-m-d');
+        if (isset($signatures['patient'])) {
+            $rawSig = $signaturesDir . '/' . $signatures['patient']['image_path'];
+            if (file_exists($rawSig)) {
+                if (function_exists('flattenPngAlphaToRgb')) {
+                    flattenPngAlphaToRgb($rawSig, $rawSig);
                 }
-
-                // Patient Signature Date
-                $signedDate = explode(' ', $signatures['patient']['signed_at'] ?? '')[0];
-                if (empty($signedDate)) $signedDate = date('Y-m-d');
-                $pdf->SetXY(305, 570);
-                $pdf->Cell(72, 12, $signedDate, 0, 0, 'C');
+                $patientSigFile = $rawSig;
             }
+            $sDate = explode(' ', $signatures['patient']['signed_at'] ?? '')[0];
+            if (!empty($sDate)) $patientSigDate = $sDate;
+        }
 
-            // Patient Representative Text (Name & Relationship)
-            if ($guardian && !empty($guardian['name'])) {
-                $repText = $guardian['name'];
-                if (!empty($guardian['relationship'])) {
-                    $repText .= ' (' . $guardian['relationship'] . ')';
-                }
-                $pdf->SetXY(24, 604);
-                $pdf->Cell(267, 12, $repText, 0, 0, 'L');
-            }
-
-            // --- Physician / TCM Practitioner Signature ---
-            // Ensure physician line labels are rendered
-            $pdf->SetFont($fontChinese, '', 10);
-            $pdf->SetXY(23.5, 698.0);
-            $pdf->Cell(270, 12, '当值医师姓名/签名 Name of duty Physician/Signature.', 0, 0, 'L');
-            $pdf->SetXY(305.0, 698.0);
-            $pdf->Cell(120, 12, '日期 Date.', 0, 0, 'L');
-
-            $pdf->SetFont($fontChinese, '', 12);
-            if (isset($signatures['practitioner'])) {
-                $docSigFile = $signaturesDir . '/' . $signatures['practitioner']['image_path'];
-                if (file_exists($docSigFile)) {
-                    // Position above line y=697
-                    $pdf->Image($docSigFile, 35, 648, 180, 45, 'PNG', '', '', false, 300, '', false, false, 0, 'CM');
-                }
-
-                // Physician Name
-                $docName = $signatures['practitioner']['signed_by'] ?? 'Dr. Siah Ah Cheok';
-                $pdf->SetXY(24, 681);
-                $pdf->Cell(267, 12, $docName, 0, 0, 'L');
-
-                // Physician Signature Date
-                $docSignedDate = explode(' ', $signatures['practitioner']['signed_at'] ?? '')[0];
-                if (empty($docSignedDate)) $docSignedDate = date('Y-m-d');
-                $pdf->SetXY(305, 681);
-                $pdf->Cell(72, 12, $docSignedDate, 0, 0, 'C');
+        $patientRepText = '';
+        if ($guardian && !empty($guardian['name'])) {
+            $patientRepText = $guardian['name'];
+            if (!empty($guardian['relationship'])) {
+                $patientRepText .= ' (' . $guardian['relationship'] . ')';
             }
         }
+
+        $docSigFile = null;
+        $physicianName = 'Dr. Siah Ah Cheok';
+        $docSigDate = date('Y-m-d');
+        if (isset($signatures['practitioner'])) {
+            $rawDocSig = $signaturesDir . '/' . $signatures['practitioner']['image_path'];
+            if (file_exists($rawDocSig)) {
+                if (function_exists('flattenPngAlphaToRgb')) {
+                    flattenPngAlphaToRgb($rawDocSig, $rawDocSig);
+                }
+                $docSigFile = $rawDocSig;
+            }
+            if (!empty($signatures['practitioner']['signed_by'])) {
+                $physicianName = $signatures['practitioner']['signed_by'];
+            }
+            $dDate = explode(' ', $signatures['practitioner']['signed_at'] ?? '')[0];
+            if (!empty($dDate)) $docSigDate = $dDate;
+        }
+
+        // Render HTML
+        $templateFile = __DIR__ . '/../templates/pdf_consent_template.php';
+        if (!file_exists($templateFile)) {
+            throw new Exception("HTML template file not found at templates/pdf_consent_template.php");
+        }
+
+        ob_start();
+        include $templateFile;
+        $html = ob_get_clean();
+
+        // Initialize TCPDF
+        $pdf = new TCPDF('P', 'pt', 'LETTER', true, 'UTF-8', false);
+        $pdf->SetCreator('InformedConsentTCM Pure PHP');
+        $pdf->SetAuthor('SIAH AH CHEOK CHINESE SIN-SEH CLINIC');
+        $pdf->SetTitle('Health Questionnaire TCM - ' . $patientName);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        
+        // Page geometry: Letter is 612 x 792 pt
+        $pdf->SetMargins(38, 30, 38, true);
+        $pdf->SetAutoPageBreak(true, 28);
+        $pdf->SetFont('cid0cs', '', 9.5);
+        $pdf->SetTextColor(20, 20, 20);
+
+        // Add first page and write HTML content (page-break is handled automatically by CSS)
+        $pdf->AddPage();
+        $pdf->writeHTML($html, true, false, true, false, '');
 
         // Output Directory
         $pdfDir = $this->storageDir . '/pdf';

@@ -46,7 +46,7 @@ try {
 
     $fileName = 'sig_' . $consentId . '_practitioner.png';
     $filePath = $sigDir . '/' . $fileName;
-    if (file_put_contents($filePath, $data) === false) {
+    if (flattenPngAlphaToRgb($data, $filePath) === false) {
         throw new Exception("Failed to save signature image.");
     }
 
